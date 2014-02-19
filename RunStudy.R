@@ -24,8 +24,8 @@ datafile_name="Plastics" # do not add .csv at the end! make sure the data are nu
 
 # Please ENTER the filename of the Report and Slides (in the doc directory) to generate 
 
-#report_file = "Report"
-report_file = "SomeCode"
+report_file = "Report"
+#report_file = "SomeCode"
 slides_file = "Slides"
 
 # Please ENTER then original raw attributes to use. 
