@@ -24,13 +24,13 @@ datafile_name="Plastics" # do not add .csv at the end! make sure the data are nu
 
 # Please ENTER the filename of the Report and Slides (in the doc directory) to generate 
 
-report_file = "Report"
-#report_file = "SomeCode"
+#report_file = "Report"
+report_file = "SomeCode"
 slides_file = "Slides"
 
 # Please ENTER then original raw attributes to use. 
 # Please use numbers, not column names! e.g. c(1:5, 7, 8) uses columns 1,2,3,4,5,7,8
-factor_attributes_used= c(4:45)
+factor_attributes_used= c(3:22)
 
 # Please ENTER the selection criterions for the factors to use. 
 # Choices: "eigenvalue", "variance", "manual"
@@ -72,7 +72,8 @@ start_local_webapp <- 0
 # Now run everything
 
 # this loads the selected data: DO NOT EDIT THIS LINE
-ProjectData <- read.csv(paste(paste(local_directory, "data", sep="/"), paste(datafile_name,"csv", sep="."), sep = "/"), sep=";", dec=",") # this contains only the matrix ProjectData
+ProjectData <- read.csv(paste(paste(local_directory, "data", sep="/"), paste(datafile_name,"csv", sep="."), sep = "/"), sep=";", dec=",", skip=3, header=F, colClasses="character") # this contains only the matrix ProjectData
+ProjectData <- ProjectData[, -3]
 ProjectData=data.matrix(ProjectData) 
 
 source(paste(local_directory,"R/library.R", sep="/"))
@@ -84,7 +85,7 @@ source(paste(local_directory,"R/runcode.R", sep = "/"))
 if (start_local_webapp){
   
   # first load the data files in the data directory so that the App see them
-  Plastics <- read.csv(paste(local_directory, "data/Plastics.csv", sep = "/"), sep=";", dec=",") # this contains only the matrix ProjectData
+  Plastics <- read.csv(paste(local_directory, "data/Plastics.csv", sep = "/"), sep=";", dec=",", colClasses="character") # this contains only the matrix ProjectData
   Plastics=data.matrix(Plastics) # this file needs to be converted to "numeric"....
   
   # now run the app

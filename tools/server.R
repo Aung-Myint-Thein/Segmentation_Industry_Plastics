@@ -26,7 +26,8 @@ shinyServer(function(input, output,session) {
     
     # First read the pre-loaded file, and if the user loads another one then replace 
     # ProjectData with the filethe user loads
-    ProjectData <- read.csv(paste(paste(local_directory,"data",sep="/"), paste(input$datafile_name_coded, "csv", sep="."), sep = "/"), sep=";", dec=",") # this contains only the matrix ProjectData
+    ProjectData <- read.csv(paste(paste(local_directory,"data",sep="/"), paste(input$datafile_name_coded, "csv", sep="."), sep = "/"), sep=";", dec=",", colClasses="character",skip=3) # this contains only the matrix ProjectData
+    ProjectData <- ProjectData[, -3]
     ProjectData=data.matrix(ProjectData)
     
     updateSelectInput(session, "factor_attributes_used","Variables used for Factor Analysis",  colnames(ProjectData), selected=colnames(ProjectData)[1])

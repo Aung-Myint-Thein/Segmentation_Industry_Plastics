@@ -19,14 +19,14 @@ Some Code/Analysis from the course material/tools
 
 ```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
 #let's remove the first 2 rows and make the first row into column_names
-ProjectData = tail(ProjectData, -3)
+#ProjectData = tail(ProjectData, -3)
 #let's code the "SURVEY_VALUE_CHAIN" column first
-non_numeric_row = ProjectData[,"SURVEY_VALUE_CHAIN"]
-thevalues = unique(non_numeric_row)
-num_values = rep(0,nrow(ProjectData))
-for (iter in 1:length(thevalues))
-  num_values[which(non_numeric_row == thevalues[iter])]<- iter
-ProjectData[,"SURVEY_VALUE_CHAIN"] <- num_values
+#non_numeric_row = ProjectData[,"V3"]
+#thevalues = unique(non_numeric_row)
+#num_values = rep(0,nrow(ProjectData))
+#for (iter in 1:length(thevalues))
+#  num_values[which(non_numeric_row == thevalues[iter])]<- iter
+#ProjectData[,"V3"] <- num_values
 
 factor_attributes_used = unique(sapply(factor_attributes_used,function(i) min(ncol(ProjectData), max(i,1))))
 ProjectDataFactor=ProjectData[,factor_attributes_used]
