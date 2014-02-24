@@ -32,10 +32,12 @@ shinyServer(function(input, output,session) {
     
     # this loads the selected data: DO NOT EDIT THIS LINE
     ProjectData <- read.csv(paste(paste(local_directory, "data", sep="/"), paste(datafile_name,"csv", sep="."), sep = "/"), sep=";", dec=",", skip=3, header=F, colClasses="character") # this contains only the matrix ProjectData
+    
     ProjectDataHeader <- read.csv(paste(paste(local_directory, "data", sep="/"), paste(datafile_name,"csv", sep="."), sep = "/"), sep=";", dec=",", header=F, colClasses="character") # this contains only the matrix ProjectData
     colnames(ProjectData) <- ProjectDataHeader[1,] # header
     ProjectData <- ProjectData[, -3] # remove the non numeric variable
     ProjectData=data.matrix(ProjectData) 
+    ProjectData <- ProjectData[complete.cases(ProjectData), ]
     
     updateSelectInput(session, "factor_attributes_used","Variables used for Factor Analysis",  colnames(ProjectData), selected=colnames(ProjectData)[1])
     updateSelectInput(session, "segmentation_attributes_used","Segmentation variables used",  colnames(ProjectData), selected=colnames(ProjectData)[1])

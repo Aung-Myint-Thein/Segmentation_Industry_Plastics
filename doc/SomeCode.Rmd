@@ -327,10 +327,12 @@ print(m1,'chart')
 #### 2. Decide whether to scale or standardize the data
 
 
-```{r, results='asis'}
-#ProjectData_scaled=apply(ProjectData,2, function(r) {if (sd(r)!=0) res=(r-mean(r))/sd(r) else res=0*r; res}, na.rm=T)
+```{r results='asis'}
+#ProjectData_scaled <- apply(ProjectData,2, function(r) {if (sd(r)!=0) res=(r-mean(r))/sd(r) else res=0*r; res}, na.rm=T)
 
 ProjectData_scaled <- ProjectData
+
+#print(ProjectData_scaled)
 
 ```
 
