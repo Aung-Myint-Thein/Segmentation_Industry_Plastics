@@ -73,7 +73,9 @@ start_local_webapp <- 0
 
 # this loads the selected data: DO NOT EDIT THIS LINE
 ProjectData <- read.csv(paste(paste(local_directory, "data", sep="/"), paste(datafile_name,"csv", sep="."), sep = "/"), sep=";", dec=",", skip=3, header=F, colClasses="character") # this contains only the matrix ProjectData
-ProjectData <- ProjectData[, -3]
+ProjectDataHeader <- read.csv(paste(paste(local_directory, "data", sep="/"), paste(datafile_name,"csv", sep="."), sep = "/"), sep=";", dec=",", header=F, colClasses="character") # this contains only the matrix ProjectData
+colnames(ProjectData) <- ProjectDataHeader[1,] # header
+ProjectData <- ProjectData[, -3] # remove the non numeric variable
 ProjectData=data.matrix(ProjectData) 
 
 source(paste(local_directory,"R/library.R", sep="/"))
