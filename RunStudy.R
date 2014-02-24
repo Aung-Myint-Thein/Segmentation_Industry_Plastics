@@ -34,7 +34,7 @@ factor_attributes_used= c(3:22)
 
 # Please ENTER the selection criterions for the factors to use. 
 # Choices: "eigenvalue", "variance", "manual"
-factor_selectionciterion = "manual"
+factor_selectionciterion = "eigenvalue"
 
 # Please ENTER the desired minumum variance explained 
 # (ONLY USED in case "variance" is the factor selection criterion used). 
@@ -53,14 +53,14 @@ rotation_used="varimax"
 # Please ENTER then original raw attributes to use for the segmentation (the "segmentation attributes")
 # Please use numbers, not column names! e.g. c(1:5, 7, 8) uses columns 1,2,3,4,5,7,8
 # for boats possibly use: c(28,25,27,14,20,8,3,12,13,5,9,11,2,30,24), for Mall_Visits use c(2:9)
-segmentation_attributes_used = c(9,8,11,18,12,14,15,20,22,16) 
+segmentation_attributes_used = c(6,8,18,12,15,16) 
 
 # Please ENTER then original raw attributes to use for the profiling of the segments (the "profiling attributes")
 # Please use numbers, not column names! e.g. c(1:5, 7, 8) uses columns 1,2,3,4,5,7,8
 profile_attributes_used = c(3:44) # for boats use c(2:82), for Mall_Visits use c(2:9)
 
 # Please ENTER the number of clusters to eventually use for this report
-numb_clusters_used = 4 # for boats possibly use 5, for Mall_Visits use 3
+numb_clusters_used = 3 # for boats possibly use 5, for Mall_Visits use 3
 
 # Please enter the minimum distance from "1" the profiling values should have in order to be colored 
 # (e.g. using heatmin = 0 will color everything - try it)
