@@ -26,9 +26,16 @@ shinyServer(function(input, output,session) {
     
     # First read the pre-loaded file, and if the user loads another one then replace 
     # ProjectData with the filethe user loads
-    ProjectData <- read.csv(paste(paste(local_directory,"data",sep="/"), paste(input$datafile_name_coded, "csv", sep="."), sep = "/"), sep=";", dec=",", colClasses="character",skip=3) # this contains only the matrix ProjectData
-    ProjectData <- ProjectData[, -3]
-    ProjectData=data.matrix(ProjectData)
+    #ProjectData <- read.csv(paste(paste(local_directory,"data",sep="/"), paste(input$datafile_name_coded, "csv", sep="."), sep = "/"), sep=";", dec=",", colClasses="character",skip=3) # this contains only the matrix ProjectData
+    #ProjectData <- ProjectData[, -3]
+    #ProjectData=data.matrix(ProjectData)
+    
+    # this loads the selected data: DO NOT EDIT THIS LINE
+    ProjectData <- read.csv(paste(paste(local_directory, "data", sep="/"), paste(datafile_name,"csv", sep="."), sep = "/"), sep=";", dec=",", skip=3, header=F, colClasses="character") # this contains only the matrix ProjectData
+    ProjectDataHeader <- read.csv(paste(paste(local_directory, "data", sep="/"), paste(datafile_name,"csv", sep="."), sep = "/"), sep=";", dec=",", header=F, colClasses="character") # this contains only the matrix ProjectData
+    colnames(ProjectData) <- ProjectDataHeader[1,] # header
+    ProjectData <- ProjectData[, -3] # remove the non numeric variable
+    ProjectData=data.matrix(ProjectData) 
     
     updateSelectInput(session, "factor_attributes_used","Variables used for Factor Analysis",  colnames(ProjectData), selected=colnames(ProjectData)[1])
     updateSelectInput(session, "segmentation_attributes_used","Segmentation variables used",  colnames(ProjectData), selected=colnames(ProjectData)[1])

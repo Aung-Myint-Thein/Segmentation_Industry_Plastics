@@ -47,6 +47,46 @@ manual_numb_factors_used = 2
 # Please ENTER the rotation eventually used (e.g. "none", "varimax", "quatimax", "promax", "oblimin", "simplimax", and "cluster" - see help(principal)). Defauls is "varimax"
 rotation_used="varimax"
 
+
+# cluster start
+
+# Please ENTER then original raw attributes to use for the segmentation (the "segmentation attributes")
+# Please use numbers, not column names! e.g. c(1:5, 7, 8) uses columns 1,2,3,4,5,7,8
+# for boats possibly use: c(28,25,27,14,20,8,3,12,13,5,9,11,2,30,24), for Mall_Visits use c(2:9)
+segmentation_attributes_used = c(6, 9, 13, 16) 
+
+# Please ENTER then original raw attributes to use for the profiling of the segments (the "profiling attributes")
+# Please use numbers, not column names! e.g. c(1:5, 7, 8) uses columns 1,2,3,4,5,7,8
+profile_attributes_used = c(3:44) # for boats use c(2:82), for Mall_Visits use c(2:9)
+
+# Please ENTER the number of clusters to eventually use for this report
+numb_clusters_used = 3 # for boats possibly use 5, for Mall_Visits use 3
+
+# Please enter the minimum distance from "1" the profiling values should have in order to be colored 
+# (e.g. using heatmin = 0 will color everything - try it)
+heatmin = 0.1
+
+# Please enter the method to use for the profiling (e.g. "hclust" or "kmeans"):
+profile_with = "hclust"
+
+# Please ENTER the distance metric eventually used for the clustering in case of hierarchical clustering 
+# (e.g. "euclidean", "maximum", "manhattan", "canberra", "binary" or "minkowski" - see help(dist)). 
+# DEFAULT is "euclidean"
+distance_used="euclidean"
+
+# Please ENTER the hierarchical clustering method to use (options are:
+# "ward", "single", "complete", "average", "mcquitty", "median" or "centroid")
+# DEFAULT is "ward"
+hclust_method = "ward"
+
+# Please ENTER the kmeans clustering method to use (options are:
+# "Hartigan-Wong", "Lloyd", "Forgy", "MacQueen"
+# DEFAULT is "Lloyd"
+kmeans_method = "Lloyd"
+
+# end cluster
+
+
 # Please enter the minimum number below which you would like not to print - this makes the readability of the tables easier. Default values are either 10e6 (to print everything) or 0.5. Try both to see the difference.
 MIN_VALUE=0.5
 
@@ -77,6 +117,9 @@ ProjectDataHeader <- read.csv(paste(paste(local_directory, "data", sep="/"), pas
 colnames(ProjectData) <- ProjectDataHeader[1,] # header
 ProjectData <- ProjectData[, -3] # remove the non numeric variable
 ProjectData=data.matrix(ProjectData) 
+
+ProjectData_segment=ProjectData[,segmentation_attributes_used]
+ProjectData_profile=ProjectData[,profile_attributes_used]
 
 source(paste(local_directory,"R/library.R", sep="/"))
 if (require(shiny) == FALSE) 
