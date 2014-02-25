@@ -95,8 +95,8 @@ dependent_variable= 46
 
 # Please ENTER the attributes to use as independent variables 
 # Please use numbers, not column names! e.g. c(1:5, 7, 8) uses columns 1,2,3,4,5,7,8
-independent_variables= c(23:28, 35:42) # use 54-80 for boats
-
+#independent_variables= c(23:28, 35:42) # use 54-80 for boats
+independent_variables= c(23:42)
 
 # Please ENTER the profit/cost values for the correctly and wrong classified data:
 actual_1_predict_1 = 100
@@ -113,13 +113,13 @@ estimation_data_percent = 80
 validation_data_percent = 10
 
 # Please enter 0 if you want to "randomly" split the data in estimation and validation/test
-random_sampling = 1
+random_sampling = 0
 
 # Tree parameter
 # PLEASE ENTER THE Tree (CART) complexity control cp (e.g. 0.001 to 0.02, depending on the data)
 CART_cp = 0.01
 
-Cluster_to_test <- 2
+Cluster_to_test <- 1
 
 # Please enter the minimum size of a segment for the analysis to be done only for that segment
 min_segment = 100
