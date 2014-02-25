@@ -60,7 +60,7 @@ segmentation_attributes_used = c(6,8,18,12,15,16)
 profile_attributes_used = c(3:44) # for boats use c(2:82), for Mall_Visits use c(2:9)
 
 # Please ENTER the number of clusters to eventually use for this report
-numb_clusters_used = 4 # for boats possibly use 5, for Mall_Visits use 3
+numb_clusters_used = 3 # for boats possibly use 5, for Mall_Visits use 3
 
 # Please enter the minimum distance from "1" the profiling values should have in order to be colored 
 # (e.g. using heatmin = 0 will color everything - try it)
@@ -91,11 +91,11 @@ kmeans_method = "Lloyd"
 # Please ENTER the class (dependent) variable:
 # Please use numbers, not column names! e.g. 82 uses the 82nd column are dependent variable.
 # YOU NEED TO MAKE SURE THAT THE DEPENDENT VARIABLES TAKES ONLY 2 VALUES: 0 and 1!!!
-dependent_variable= 45
+dependent_variable= 46
 
 # Please ENTER the attributes to use as independent variables 
 # Please use numbers, not column names! e.g. c(1:5, 7, 8) uses columns 1,2,3,4,5,7,8
-independent_variables= c(3:44) # use 54-80 for boats
+independent_variables= c(23:28, 35:42) # use 54-80 for boats
 
 # Please ENTER the profit/cost values for the correctly and wrong classified data:
 actual_1_predict_1 = 100
@@ -112,11 +112,13 @@ estimation_data_percent = 80
 validation_data_percent = 10
 
 # Please enter 0 if you want to "randomly" split the data in estimation and validation/test
-random_sampling = 0
+random_sampling = 1
 
 # Tree parameter
 # PLEASE ENTER THE Tree (CART) complexity control cp (e.g. 0.001 to 0.02, depending on the data)
 CART_cp = 0.01
+
+Cluster_to_test <- 3
 
 # Please enter the minimum size of a segment for the analysis to be done only for that segment
 min_segment = 100
@@ -160,18 +162,8 @@ ProjectData <- ProjectData[complete.cases(ProjectData), ]
 ProjectData_segment=ProjectData[,segmentation_attributes_used]
 ProjectData_profile=ProjectData[,profile_attributes_used]
 
-
-Probability_Threshold = Probability_Threshold/100 # make it between 0 and 1
-dependent_variable = unique(sapply(dependent_variable,function(i) min(ncol(ProjectData), max(i,1))))
-independent_variables = unique(sapply(independent_variables,function(i) min(ncol(ProjectData), max(i,1))))
-
-if (length(unique(ProjectData[,dependent_variable])) !=2){
-  cat("\n*****\n BE CAREFUL, THE DEPENDENT VARIABLE TAKES MORE THAN 2 VALUES...")
-  cat("\nSplitting it around its median...\n*****\n ")
-  new_dependent = ProjectData[,dependent_variable] >= median(ProjectData[,dependent_variable])
-  ProjectData[,dependent_variable] <- 1*new_dependent
-}
-
+test_data_percent = 100-estimation_data_percent-validation_data_percent
+CART_control = rpart.control(cp = CART_cp)
 
 source(paste(local_directory,"R/library.R", sep="/"))
 if (require(shiny) == FALSE) 
