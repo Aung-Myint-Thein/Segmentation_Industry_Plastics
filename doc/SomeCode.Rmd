@@ -538,6 +538,19 @@ kmeans_clusters <- kmeans(ProjectData_segment,centers= numb_clusters_used, iter.
 
 ProjectData_with_kmeans_membership <- cbind(1:length(kmeans_clusters$cluster),kmeans_clusters$cluster)
 colnames(ProjectData_with_kmeans_membership)<-c("Observation Number","Cluster_Membership")
+
+## getting the cluster ids into Project Data
+
+ProjectData <- cbind(ProjectData, kmeans_clusters$cluster)
+colnames(ProjectData)[ncol(ProjectData)] <- "Cluster_Membership"
+cluster_membership_test <- rep(0, nrow(ProjectData))
+ProjectData <- cbind(ProjectData, cluster_membership_test)
+colnames(ProjectData)[ncol(ProjectData)] <- "Cluster_test"
+
+Cluster_to_test <- 4
+
+ProjectData[ProjectData[, 45] == Cluster_to_test , 46] <- 1
+
 ```
 
 <div class="row">
