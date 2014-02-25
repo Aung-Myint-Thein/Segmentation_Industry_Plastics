@@ -97,6 +97,7 @@ dependent_variable= 46
 # Please use numbers, not column names! e.g. c(1:5, 7, 8) uses columns 1,2,3,4,5,7,8
 independent_variables= c(23:28, 35:42) # use 54-80 for boats
 
+
 # Please ENTER the profit/cost values for the correctly and wrong classified data:
 actual_1_predict_1 = 100
 actual_1_predict_0 = -75
@@ -118,7 +119,7 @@ random_sampling = 1
 # PLEASE ENTER THE Tree (CART) complexity control cp (e.g. 0.001 to 0.02, depending on the data)
 CART_cp = 0.01
 
-Cluster_to_test <- 3
+Cluster_to_test <- 2
 
 # Please enter the minimum size of a segment for the analysis to be done only for that segment
 min_segment = 100
