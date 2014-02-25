@@ -200,6 +200,8 @@ if (factors_selected >=2){
   } else {
     print(xtable(NEW_ProjectData, caption="Only 1 derived variable generated", digits=3), type="html",html.table.attributes="class='table table-striped table-hover table-bordered'", caption.placement="top", comment=FALSE, include.rownames=TRUE, include.colnames=TRUE)
     }
+
+ProjectData_segment <- NEW_ProjectData
 ```
 </div>
 </div>
@@ -367,7 +369,7 @@ We decide to use the unscaled data for now.
 
 #### Step 3. Decide which variables to use for clustering
 
-YOUR TEXT
+Line 204. Currently it used the factor scores. Need explanations.
 
 
 #### Step 4. Define similarity or dissimilarity measures between observations
@@ -623,9 +625,11 @@ if (ncol(ProjectData_scaled_profile) < 2)
   Cluster_Profile_standar_mean = t(Cluster_Profile_standar_mean)
 colnames(Cluster_Profile_standar_mean) <- paste("Segment", 1:length(cluster_ids), sep=" ")
 
-plot(Cluster_Profile_standar_mean[, 1,drop=F], type="l", col="red", main="Snake plot for each cluster", ylab="mean of cluster", xlab="profiling variables (standardized)",ylim=c(min(Cluster_Profile_standar_mean),max(Cluster_Profile_standar_mean))) 
+custColors <- rainbow(12)[c(1, 2, 5, 9, 11, 12)]
+
+plot(Cluster_Profile_standar_mean[, 1,drop=F], type="l", col=custColors[1], main="Snake plot for each cluster", ylab="mean of cluster", xlab="profiling variables (standardized)",ylim=c(min(Cluster_Profile_standar_mean),max(Cluster_Profile_standar_mean))) 
 for(i in 2:ncol(Cluster_Profile_standar_mean))
-  lines(Cluster_Profile_standar_mean[, i], col="blue")
+  lines(Cluster_Profile_standar_mean[, i], col=custColors[i])
 ```
 
 Can we see differences between the segments? Do the segments differ in terms of their average household income and in terms of how often they visit the mall? What else can we say about these segments?

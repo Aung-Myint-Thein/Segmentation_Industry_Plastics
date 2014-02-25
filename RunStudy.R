@@ -60,7 +60,7 @@ segmentation_attributes_used = c(6,8,18,12,15,16)
 profile_attributes_used = c(3:44) # for boats use c(2:82), for Mall_Visits use c(2:9)
 
 # Please ENTER the number of clusters to eventually use for this report
-numb_clusters_used = 3 # for boats possibly use 5, for Mall_Visits use 3
+numb_clusters_used = 4 # for boats possibly use 5, for Mall_Visits use 3
 
 # Please enter the minimum distance from "1" the profiling values should have in order to be colored 
 # (e.g. using heatmin = 0 will color everything - try it)
