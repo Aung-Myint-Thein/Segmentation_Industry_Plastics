@@ -1,6 +1,6 @@
 # Project Name: "Segmentation_Industry_Plastics"
 rm(list = ls( )) # clean up the workspace
-
+set.seed(123444222)
 ######################################################################
 
 # THESE ARE THE PROJECT PARAMETERS NEEDED TO GENERATE THE REPORT

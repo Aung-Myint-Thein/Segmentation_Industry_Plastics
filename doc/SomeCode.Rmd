@@ -11,11 +11,43 @@ text-align:center;
 Market Segmentation for a B2B Company
 ========================================================
 
-**INSEAD Data Analytics Group Project**
+**Aung Myint Thein (INSEAD eLab)**
 
 
-Some Code/Analysis from the course material/tools
----------------------------------------------------------
+## Introduction
+
+The client is the second largest global diversified chemical company in the world, with over $50 billion in revenue.  The client manufactures chemicals, fertilizers, metals, and plastics in more than 60 locations around the world.
+The clients' innovative plastics business is committed to collaborating with customers to leverage the extensive product portfolio of thermoplastic resins, coatings, specialty compounds, film, and sheet materials as well as the broad industry expertise.
+
+## Customer survey outline
+
+In 2013 the company held a customer survey to understand the needs for companies to select a plastics material supplier. In total almost 1800 customers were interviewed. However, after removing the missing data, our analysis will be based on `r nrow(ProjectData)` rows of data.
+
+The survey results are provided anonymously in the excel file. Customer names and specific customer needs are not mentioned. The data set does include the following variables:
+
+* Data set
+* Respondent number (there could be more than one respondent in one company)
+* Company number
+* Pole (Europe, America, APAC)
+* Type of function of the respondent
+* Place in value chain
+* Max_Diff relative importance of the 20 needs mentioned above (Need_1 to Need_20)
+* Behavioral information (20) 
+
+The behavioral variables are either binary or measured on a 5-point scale:
+
+a.  The 5 point-scale is defined as:
+
+* Very unlikely = 1
+* Unlikely = 2
+* Do not know = 3
+* Likely = 4
+* Very likely = 5
+
+b.  The binary scale is defined as:
+
+* Yes = 1
+* No = 0
 
 ```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
 #let's remove the first 2 rows and make the first row into column_names
@@ -36,26 +68,29 @@ ProjectDataFactor = data.matrix(ProjectDataFactor)
 ProjectData = data.matrix(ProjectData)
 ```
 
-This is how the first `r min(max_data_report, nrow(ProjectData))` data looks (ignoring the NON-numerical columns):
+This is how the first `r min(max_data_report, nrow(ProjectData))` rows of data looks (ignoring the NON-numerical columns):
 <br>
 
 <div class="row">
 <div class="col-md-6">
 ```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
-show_data = data.frame(round(ProjectDataFactor,2))
+show_data = data.frame(round(ProjectData,2))
 show_data = show_data[1:min(max_data_report,nrow(show_data)),]
 row<-rownames(show_data)
 dfnew<-cbind(row,show_data)
 change<-colnames(dfnew)
-change[1]<-"Variables"
+change[1]<-"No."
 colnames (dfnew)<-change
-m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
+m1<-gvisTable(dfnew, options=list(showRowNumber=F,width=1220, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
 print(m1,'chart')
 ```
 </div>
 </div>
-<br> <br>
+<br>
 
+## Checking the data
+
+After going through several iterations, I have decided to use customer needs for factor analysis. We can see the descriptive statistics of the data as following.
 
 <div class="row">
 <div class="col-md-6">
@@ -73,12 +108,13 @@ print(m1,'chart')
 </div>
 </div>
 
+Having some variables with a very different range/scale can often create problems: **most of the "results" may be driven by a few large values**, more so that we would like. To avoid such issues, one has to consider whether or not to **standardize the data** by making some of the initial raw attributes have, for example,  mean  0 and standard deviation 1 (e.g. scaled_low_materaial_price = (low_materaial_price-mean(low_materaial_price))/sd(low_materaial_price) ), or scaling them between 0 and 1 (e.g. scaledlow_materaial_price=(low_materaial_price-min(low_materaial_price))/(max(low_materaial_price)-min(low_materaial_price))). Here is for example the R code for the first approach, if we want to standardize all attributes:
 
 ```{r, results='asis'}
 ProjectDatafactor_scaled=apply(ProjectDataFactor,2, function(r) {if (sd(r)!=0) res=(r-mean(r))/sd(r) else res=0*r; res})
 ```
 
-
+However, note that for this data, all customer needs survey data are on a similar scale. So, I have decided not to standardize the data and to use original values. 
 
 ```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, results='asis'}
 thecor = round(cor(ProjectDataFactor),2)
