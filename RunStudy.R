@@ -34,7 +34,7 @@ factor_attributes_used= c(3:22)
 
 # Please ENTER the selection criterions for the factors to use. 
 # Choices: "eigenvalue", "variance", "manual"
-factor_selectionciterion = "eigenvalue"
+factor_selectionciterion = "manual"
 
 # Please ENTER the desired minumum variance explained 
 # (ONLY USED in case "variance" is the factor selection criterion used). 
@@ -120,7 +120,7 @@ random_sampling = 0
 # PLEASE ENTER THE Tree (CART) complexity control cp (e.g. 0.001 to 0.02, depending on the data)
 CART_cp = 0.01
 
-Cluster_to_test <- 3
+Cluster_to_test <- 2
 
 # Please enter the minimum size of a segment for the analysis to be done only for that segment
 min_segment = 100
