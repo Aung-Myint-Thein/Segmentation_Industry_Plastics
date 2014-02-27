@@ -16,8 +16,13 @@ Market Segmentation for a B2B Company
 
 ## Introduction
 
-The client is the second largest global diversified chemical company in the world, with over $50 billion in revenue.  The client manufactures chemicals, fertilizers, metals, and plastics in more than 60 locations around the world.
-The clients' innovative plastics business is committed to collaborating with customers to leverage the extensive product portfolio of thermoplastic resins, coatings, specialty compounds, film, and sheet materials as well as the broad industry expertise.
+The client is the second largest global diversified chemical company in the world, with over $50 billion in revenue.  The client manufactures chemicals, fertilizers, metals, and plastics in more than 60 locations around the world. The clients' innovative plastics business is committed to collaborating with customers to leverage the extensive product portfolio of thermoplastic resins, coatings, specialty compounds, film, and sheet materials as well as the broad industry expertise.
+
+This report will analyze the data to identify key input variables for the segmentation using through factor analysis using `r estimation_data_percent`% of the provided data. After analyzing with factor analysis and cluster analysis, I will provide (2-5) segments which represent clusters with specific and differential needs. After that, I will use classification to develop a modal for placing specific customer in one of the segments and will provide the accuracy of the modal with hit ratios, confusion matrix, ROC curves, Lift curves, and Profit curves. Finally, I will access the accuracy of the modal using `r test_data_percent`% of the data and will recommend what additional data should be gathered in a possible new customer survey.
+
+## Executive Summary of the findings
+
+To be written after everything.. da da da
 
 ## Customer survey outline
 
@@ -88,7 +93,7 @@ print(m1,'chart')
 </div>
 <br>
 
-## Checking the data
+### Checking the data
 
 After going through several iterations, I have decided to use customer needs for factor analysis. We can see the descriptive statistics of the data as following.
 
@@ -107,14 +112,23 @@ print(m1,'chart')
 ```
 </div>
 </div>
+<br>
 
 Having some variables with a very different range/scale can often create problems: **most of the "results" may be driven by a few large values**, more so that we would like. To avoid such issues, one has to consider whether or not to **standardize the data** by making some of the initial raw attributes have, for example,  mean  0 and standard deviation 1 (e.g. scaled_low_materaial_price = (low_materaial_price-mean(low_materaial_price))/sd(low_materaial_price) ), or scaling them between 0 and 1 (e.g. scaledlow_materaial_price=(low_materaial_price-min(low_materaial_price))/(max(low_materaial_price)-min(low_materaial_price))). Here is for example the R code for the first approach, if we want to standardize all attributes:
+
 
 ```{r, results='asis'}
 ProjectDatafactor_scaled=apply(ProjectDataFactor,2, function(r) {if (sd(r)!=0) res=(r-mean(r))/sd(r) else res=0*r; res})
 ```
 
-However, note that for this data, all customer needs survey data are on a similar scale. So, I have decided not to standardize the data and to use original values. 
+However, note that for this data, all customer needs survey data are on a similar scale. So, I have decided **not to standardize the data and to use original values.** 
+<br>
+
+### Check correlation matrix to see if Factor Analysis makes sense
+
+The type of dimensionality reduction methods we will use here "groups together raw attributes that are highly correlated". Other methods (there are many!) use different criteria to create derived variables.  For this to be feasible, it is necessary that the original raw attributes do have large enough correlations (e.g. more than 0.5 in absolute value, or simply statistically significant). It is therefore useful to see the correlation matrix of the original attributes - something that one should anyway always do in order to develop a better understanding of the data. 
+
+Following is the correlation matrix of the `r length(factor_attributes_used)` original variable we use for factor analysis.
 
 ```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, results='asis'}
 thecor = round(cor(ProjectDataFactor),2)
@@ -123,14 +137,30 @@ rownames(thecor)<-colnames(ProjectDataFactor)
 ## printing the result in a clean-slate table
 cat(renderHeatmapX(thecor, border=1, center = 0,vrange_up = 1, vrange_down = 1))
 ```
+<br>
 
+There are quite a few large (in absolute value) correlations. Therefore, we will proceed to factor analysis.
 
-```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
+### Factor Analysis
+
+There are many statistical methods to generate derived variables from raw data. One of the most standard ones is **Principal Component Analysis**. This method finds factors, called **Principal Components**, which are **linear combinations of the original raw attributes** so that most of the information in the data, measured using  **variance explained** (roughly "how much of the variability in the data is captured by the selected components") is captured by only a few factors. The components are developed typically so that they are **uncorrelated**, leading to *at most as many factors as the number of the original raw attributes, but* so that only a few are needed (the *principal compontents*) to keep most of the information (variance/variability) in the raw data. For example, for our data we have `r ncol(ProjectData)` raw attributes hence we can only have a total of `r ncol(ProjectData)` factors/compontents, each of them being a linear combination of the `r ncol(ProjectData)` original raw data. 
+
+While there are as many (and for other methods, more) factors as the number of original raw attributes, since our goal is to identify key input vartiables or factors, we need to make sure not to lose much information when we use only a few of the components. 
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, results='asis'}
 UnRotated_Results<-principal(ProjectDataFactor, nfactors=ncol(ProjectDataFactor), rotate="none",score=TRUE)
 UnRotated_Factors<-round(UnRotated_Results$loadings,2)
 UnRotated_Factors<-as.data.frame(unclass(UnRotated_Factors))
 colnames(UnRotated_Factors)<-paste("Component",1:ncol(UnRotated_Factors),sep=" ")
 ```
+
+When using PCA, we have two measures of "how much of the information (variance in this case) in the original raw data is captured by any of the factors": 
+
+a) the *percentage of variance explained*, 
+
+b) the *eigenvalue coresponding to the compontent*.
+
+Each factor has an eigenvalue as well as the percentage of the variance explained. The sum of the eigenvalues of the components is equal to the number of original raw attributes used for factor analysis, while the sum of the percentages of the variance explained across all components is 100%. For example, for our data these are:
 
 ```{r echo=FALSE, comment=NA, warning=FALSE, error=FALSE,message=FALSE,results='asis'}
 Variance_Explained_Table_results<-PCA(ProjectDataFactor, graph=FALSE)
@@ -147,8 +177,15 @@ colnames(Variance_Explained_Table)<-c("Components", "Eigenvalue", "Percentage_of
 m<-gvisTable(Variance_Explained_Table,options=list(width=1200, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'),formats=list(Eigenvalue="#.##",Percentage_of_explained_variance="#.##",Cumulative_percentage_of_explained_variance="#.##"))
 print(m,'chart')
 ```
-<br> <br>
+<br>
 
+Two Statistical criteria to select the number of factors/derived variables when using PCA are
+
+1. select components with corresponding eigenvalue larger than 1.
+
+2. Select the components with the highest eigenvalues "up to the component" for which the cumulative total variance explained is relatively large (e.g. more than 50%).
+
+We can also plot the eigenvalues of the generated factors in decreasing order: this plot is called the **scree plot**. For our data this plot looks as follows:
 
 ```{r Fig1, echo=FALSE, comment=NA, results='asis', message=FALSE, fig.align='center', fig=TRUE}
 
@@ -159,22 +196,21 @@ Line         <- gvisLineChart(as.data.frame(df), xvar="components", yvar=c("eige
 print(Line, 'chart')
 ```
 
-
-
 ```{r echo=FALSE, comment=NA, warning=FALSE,message=FALSE,results='asis'}
+## setting for number of factors
 if (factor_selectionciterion == "eigenvalue")
   factors_selected = sum(Variance_Explained_Table_copy[,1] >= 1)
 if (factor_selectionciterion == "variance")
   factors_selected = 1:head(which(Variance_Explained_Table_copy[,"cumulative percentage of variance"]>= minimum_variance_explained),1)
 if (factor_selectionciterion == "manual")
   factors_selected = manual_numb_factors_used
-
 ```
+
 
 
 ```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
 
-Rotated_Results<-principal(ProjectDataFactor, nfactors=max(factors_selected), rotate=rotation_used,score=TRUE)
+Rotated_Results<-principal(ProjectDataFactor, nfactors=max(factors_selected), rotate=rotation_used, score=TRUE)
 Rotated_Factors<-round(Rotated_Results$loadings,2)
 Rotated_Factors<-as.data.frame(unclass(Rotated_Factors))
 colnames(Rotated_Factors)<-paste("Component",1:ncol(Rotated_Factors),sep=" ")
@@ -1456,8 +1492,8 @@ test_prediction_best = test_predictions[which.max(validation_hit_rates),]
 conf_matrix = matrix(rep(0,4),ncol=2)
 conf_matrix[1,1]<- 100*sum(test_prediction_best*test_data[,dependent_variable])/sum(test_data[,dependent_variable])
 conf_matrix[1,2]<- 100*sum((!test_prediction_best)*test_data[,dependent_variable])/sum(test_data[,dependent_variable])
-conf_matrix[2,1]<- 100*sum((!test_prediction_best)*(!test_data[,dependent_variable]))/sum((!test_data[,dependent_variable]))
-conf_matrix[2,2]<- 100*sum((test_prediction_best)*(!test_data[,dependent_variable]))/sum((!test_data[,dependent_variable]))
+conf_matrix[2,2]<- 100*sum((!test_prediction_best)*(!test_data[,dependent_variable]))/sum((!test_data[,dependent_variable]))
+conf_matrix[2,1]<- 100*sum((test_prediction_best)*(!test_data[,dependent_variable]))/sum((!test_data[,dependent_variable]))
 conf_matrix = round(conf_matrix,2)
 
 colnames(conf_matrix) <- c("Predicted 1", "Predicted 0")
