@@ -185,7 +185,7 @@ Two Statistical criteria to select the number of factors/derived variables when 
 
 2. Select the components with the highest eigenvalues "up to the component" for which the cumulative total variance explained is relatively large (e.g. more than 50%).
 
-We can also plot the eigenvalues of the generated factors in decreasing order: this plot is called the **scree plot**. For our data this plot looks as follows:
+We can also plot the eigenvalues of the generated factors in decreasing order: this plot is called the **scree plot**. An abline is added at the value 1 so that we can easily see how many components will have eigenvalue larger than 1. For our data this plot looks as follows:
 
 ```{r Fig1, echo=FALSE, comment=NA, results='asis', message=FALSE, fig.align='center', fig=TRUE}
 
@@ -206,6 +206,7 @@ if (factor_selectionciterion == "manual")
   factors_selected = manual_numb_factors_used
 ```
 
+Although they are statistical rules, I have decided to use `r factors_selected` components. The main reason is that up to `r sum(Variance_Explained_Table_copy[,1] >= 1)` components, which has eigenvalue larger than 1, can cover only `r round(Variance_Explained_Table_copy[sum(Variance_Explained_Table_copy[,1] >= 1), "cumulative percentage of variance"], 2)`% of the variance. By having `r factors_selected` components, I can cover up to `r round(Variance_Explained_Table_copy[factors_selected, "cumulative percentage of variance"], 2)`% of the variance which I believe is a more appropriate to do further analysis.
 
 
 ```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
