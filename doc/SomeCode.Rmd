@@ -441,11 +441,11 @@ hist(Pairwise_Distances, main = NULL, xlab="Histogram of all pairwise Distances 
 
 #### Step 6. Select the clustering method to use and decide how many clusters to have
 
-YOUR TEXT
+We will explore two widely used methods: **Hierarchical Clustering Method** and **Kmeans Clustering Method**. Like all clustering methods, these two also require that we have decided how to measure the distance/similarity between our observations. The only difference to highlight is that Kmeans requires the user to define how many segments to create, while Hierarchical Clustering does not.
 
-In this note we will use two widely used methods: the **Kmeans Clustering Method**, and the **Hierarchical Clustering Method**. Like all clustering methods, these two also require that we have decided how to measure the distance/similarity between our observations.  Explaining how these methods work is beyond our scope. The only difference to highlight is that Kmeans requires the user to define how many segments to create, while Hierarchical Clustering does not. 
+**Hierarchial Clustering**
 
-Let's fist use the **Hierarchial Clustering** method, as we do not know for now how many segments there are in our data. Hierarchical clustering is a  method that also helps us visualise how the data may be clustering together. It generates a plot called the **Dendrogram** which is often helpful for visualization - but should be used with care. For example, in this case the dendrogram, using the `r distance_used` distance metric from the earlier steps and the ``r hclust_method` hierarchical clustering option (see below as well as help(hclust) in R for more information), is as follows:
+When we do not know how many segments there are in our data, hierarchical clustering is a  method that also helps us visualise how the data may be clustering together. It generates a plot called the **Dendrogram** which is often helpful for visualization - but should be used with care. For example, in this case the dendrogram, using the `r distance_used` distance metric from the earlier steps and the ``r hclust_method` hierarchical clustering option (see below as well as help(hclust) in R for more information), is as follows:
 
 ```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, fig.align='center', results='asis'}
 Hierarchical_Cluster_distances <- dist(ProjectData_segment, method=distance_used)
@@ -456,10 +456,7 @@ plot(Hierarchical_Cluster, main = NULL, sub=NULL, labels = 1:nrow(ProjectData_se
 rect.hclust(Hierarchical_Cluster, k=numb_clusters_used, border="red") 
 ```
 
-Note that we can draw as many clusters are we choose (e.g. in this case we chose `r numb_clusters_used` clusters) around the branches of the Dendrogram.
-
-
-We can also plot the "distances" traveled before we need to merge any of the lower and smaller in size clusters into larger ones - the heights of the tree branches that link the clusters as we traverse the tree from its leaves to its root. If we have n observations, this plot has n-1 numbers. 
+Note that we can draw as many clusters as we choose (e.g. in this case we chose `r numb_clusters_used` clusters) around the branches of the Dendrogram. We can also plot the "distances" traveled before we need to merge any of the lower and smaller in size clusters into larger ones - the heights of the tree branches that link the clusters as we traverse the tree from its leaves to its root. If we have n observations, this plot has n-1 numbers. 
 
 
 ```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, fig.align='center', results='asis'}
@@ -488,19 +485,14 @@ colnames(ProjectData_with_hclust_membership)<-c("Observation Number","Cluster_Me
 ```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
 show_data = data.frame(round(ProjectData_with_hclust_membership,2))
 show_data = show_data[1:min(max_data_report,nrow(show_data)),]
-row<-rownames(show_data)
-dfnew<-cbind(row,show_data)
-change<-colnames(dfnew)
-change[1]<-"Variables"
-colnames (dfnew)<-change
-m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
+m1<-gvisTable(show_data, options=list(showRowNumber=FALSE, width=350, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
 print(m1,'chart')
 ```
 </div>
 </div>
-<br> <br>
+<br>
 
-**Using Kmean Clustering**
+**Kmean Clustering**
 
 Here are the clusters our observations belong to when we select `r numb_clusters_used` clusters and the `r kmeans_method` kmeans method, for the first `r min(max_data_report,nrow(ProjectData))` people:
 
@@ -539,18 +531,12 @@ if (length(unique(ProjectData[,dependent_variable])) !=2){
 ```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
 show_data = data.frame(round(ProjectData_with_kmeans_membership,2))
 show_data = show_data[1:min(max_data_report,nrow(show_data)),]
-row<-rownames(show_data)
-dfnew<-cbind(row,show_data)
-change<-colnames(dfnew)
-change[1]<-"Variables"
-colnames (dfnew)<-change
-m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
+m1<-gvisTable(show_data, options=list(showRowNumber=FALSE,width=350, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
 print(m1,'chart')
 ```
 </div>
 </div>
-<br> <br>
-
+<br>
 
 #### Step 7. Profile and interpret the clusters 
 
