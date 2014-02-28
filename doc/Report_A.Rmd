@@ -631,90 +631,48 @@ Using the table above, we can describe the specific and differentiated needs of 
 
 **1. Matured clients**
 
-These customers are mature businesses and there are total `r nrow(ProjectData[ProjectData[,"Cluster_Membership"]==1,])` clients (`r round(100*nrow(ProjectData[ProjectData[,"Cluster_Membership"]==1,])/nrow(ProjectData), 2)`% of whole dataset). They needs their supplier to have an efficient and reliable ordering process (`r round(cluster_profile_ratios["MAXDIFF: Efficient and reliable ordering process",1]-1,2)`% higher than population average), delivery & inventory management (`r round(cluster_profile_ratios["MAXDIFF: Delivery &amp; inventory management",1]-1,2)`% higher than population average), and formula based or fixed material price (`r round(cluster_profile_ratios["MAXDIFF: Formula based or fixed material price",1]-1,2)`% higher than population average). This shows that they are more mature and process based clients and they want certainty and predictability in their cost. This is strengthened more by having `r round(cluster_profile_ratios["MAXDIFF: Credit limit. financing and payment terms",1]-1,2)` percent higher than population average in needs of credit limit, financing and payment terms and the highest among 3 segments.
+These customers are mature businesses and there are total `r nrow(ProjectData[ProjectData[,"Cluster_Membership"]==1,])` clients (`r round(100*nrow(ProjectData[ProjectData[,"Cluster_Membership"]==1,])/nrow(ProjectData), 2)`% of whole dataset). They needs their supplier to have an efficient and reliable ordering process (`r round(100*(cluster_profile_ratios["MAXDIFF: Efficient and reliable ordering process",1]-1),2)`% higher than population average), delivery & inventory management (`r round(100*(cluster_profile_ratios["MAXDIFF: Delivery &amp; inventory management",1]-1),2)`% higher than population average), and formula based or fixed material price (`r round(100*(cluster_profile_ratios["MAXDIFF: Formula based or fixed material price",1]-1),2)`% higher than population average). This shows that they are more mature and process based clients and they want certainty and predictability in their cost. This is strengthened more by having `r round(100*(cluster_profile_ratios["MAXDIFF: Credit limit. financing and payment terms",1]-1),2)` percent higher than population average in needs of credit limit, financing and payment terms and the highest among 3 segments.
 
-Since they are already matured, clients from this segment do not care and need so much of collaboration for growth (`r round(1-cluster_profile_ratios["MAXDIFF: Collaboration for growth",1],2)`% lower than population average), global service and operations (`r round(1-cluster_profile_ratios["MAXDIFF: Global service and operations",1],2)`% lower than population average), business services (`r round(1-cluster_profile_ratios["MAXDIFF: Business services",1],2)`% lower than population average). They seem to know of what they want as they do not need their supplier to have broad material portfolio (`r round(1-cluster_profile_ratios["MAXDIFF: Broad material portfolio",1],2)`% lower than population average).
+Since they are already matured, clients from this segment do not care and need so much of collaboration for growth (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Collaboration for growth",1]),2)`% lower than population average), global service and operations (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Global service and operations",1]),2)`% lower than population average), business services (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Business services",1]),2)`% lower than population average). They seem to know of what they want as they do not need their supplier to have broad material portfolio (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Broad material portfolio",1]),2)`% lower than population average).
 
 **2. Entry level clients**
 
-These customers are entry level business and they are total `r nrow(ProjectData[ProjectData[,"Cluster_Membership"]==2,])` clients (`r round(100*nrow(ProjectData[ProjectData[,"Cluster_Membership"]==2,])/nrow(ProjectData), 2)`% of whole dataset). Since they are entry level businesses, they are willing to collaborate for growth (`r round(cluster_profile_ratios["MAXDIFF: Collaboration for growth",2]-1,2)`% higher than population average) and they needs their supplier support towards their sustainabile goals (`r round(cluster_profile_ratios["MAXDIFF: Support towards your sustainability goals",2]-1,2)`% higher than population average). Being an entry level businesses, they also want dedicated account manager relationship (`r round(cluster_profile_ratios["MAXDIFF: Account manager relationship",2]-1,2)`% higher than population average) and they need their supplier to have a strong business services (`r round(cluster_profile_ratios["MAXDIFF: Business services",2]-1,2)`% higher than population average) and global service and operations (`r round(cluster_profile_ratios["MAXDIFF: Global service and operations",2]-1,2)`% higher than population average). 
+These customers are entry level business and they are total `r nrow(ProjectData[ProjectData[,"Cluster_Membership"]==2,])` clients (`r round(100*nrow(ProjectData[ProjectData[,"Cluster_Membership"]==2,])/nrow(ProjectData), 2)`% of whole dataset). Since they are entry level businesses, they are willing to collaborate for growth (`r round(100*(cluster_profile_ratios["MAXDIFF: Collaboration for growth",2]-1),2)`% higher than population average) and they needs their supplier support towards their sustainabile goals (`r round(100*(cluster_profile_ratios["MAXDIFF: Support towards your sustainability goals",2]-1),2)`% higher than population average). Being an entry level businesses, they also want dedicated account manager relationship (`r round(100*(cluster_profile_ratios["MAXDIFF: Account manager relationship",2]-1),2)`% higher than population average) and they need their supplier to have a strong business services (`r round(100*(cluster_profile_ratios["MAXDIFF: Business services",2]-1),2)`% higher than population average) and global service and operations (`r round(100*(cluster_profile_ratios["MAXDIFF: Global service and operations",2]-1),2)`% higher than population average). 
 
-Strangely, they are not very much interested in material coloring solutions (`r round(1-cluster_profile_ratios["MAXDIFF: Material coloring solutions",2],2)`% lower than population average) and broad material portfolio (`r round(1-cluster_profile_ratios["MAXDIFF: Broad material portfolio",2],2)`% lower than population average). This may be because they are entry level businesses and they still do not need sophisticated and advanced services.
+Strangely, they are not very much interested in material coloring solutions (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Material coloring solutions",2]),2)`% lower than population average) and broad material portfolio (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Broad material portfolio",2]),2)`% lower than population average). This may be because they are entry level businesses and they still do not need sophisticated and advanced services.
 
-Most importantly, they paid premium in the past (`r round(cluster_profile_ratios["Paid premium in past",2]-1,2)`% higher than population average) and therefore, they are valuable customers. However, they have highest average score in "willing to change supplier" with `r round(cluster_profile_ratios["Willing to Changing suppliers",2],2)` among all segments. So, we need to pay more attention to this segments and our subsequent analysis will be based on this segment.
+Most importantly, they paid premium in the past (`r round(100*(cluster_profile_ratios["Paid premium in past",2]-1),2)`% higher than population average) and therefore, they are valuable customers. However, they have highest average score in "willing to change supplier" with `r round(cluster_profile_ratios["Willing to Changing suppliers",2],2)` among all segments. So, we need to pay more attention to this segments as this segment has a lot of room to improve and can grow the business and our subsequent analysis will be based on this segment.
 
 **3. Support oriented and cash rich clients**
 
-These customers are support oriented and cash rich clients and they are total `r nrow(ProjectData[ProjectData[,"Cluster_Membership"]==3,])` clients (`r round(100*nrow(ProjectData[ProjectData[,"Cluster_Membership"]==3,])/nrow(ProjectData), 2)`% of whole dataset). They rate highly generally on support related questions such as material selection support (`r round(cluster_profile_ratios["MAXDIFF: Material selection support",3]-1,2)`% higher than population average), processing support (`r round(cluster_profile_ratios["MAXDIFF: Processing support",3]-1,2)`% higher than population average), and application development support (`r round(cluster_profile_ratios["MAXDIFF: Application development support",3]-1,2)`% higher than population average). Interestingly, they need supplier with significantly broad material portfolio (`r round(cluster_profile_ratios["MAXDIFF: Broad material portfolio",3]-1,2)`% higher than population average) and material coloring solutions (`r round(cluster_profile_ratios["MAXDIFF: Material coloring solutions",3]-1,2)`% higher than population average). May be because their need of products are diversed and therefore, they rate less for fixed material price (check below). As support oriented clients, they are more interested to collaborate during innovation process (`r round(cluster_profile_ratios["MAXDIFF: Collaboration during your innovation process",3]-1,2)`% higher than population average) than collaboration for growth (`r round(1-cluster_profile_ratios["MAXDIFF: Collaboration for growth",3],2)`% lower than population average). 
+These customers are support oriented and cash rich clients and they are total `r nrow(ProjectData[ProjectData[,"Cluster_Membership"]==3,])` clients (`r round(100*nrow(ProjectData[ProjectData[,"Cluster_Membership"]==3,])/nrow(ProjectData), 2)`% of whole dataset). They rate highly generally on support related questions such as material selection support (`r round(100*(cluster_profile_ratios["MAXDIFF: Material selection support",3]-1),2)`% higher than population average), processing support (`r round(100*(cluster_profile_ratios["MAXDIFF: Processing support",3]-1),2)`% higher than population average), and application development support (`r round(100*(cluster_profile_ratios["MAXDIFF: Application development support",3]-1),2)`% higher than population average). Interestingly, they need supplier with significantly broad material portfolio (`r round(100*(cluster_profile_ratios["MAXDIFF: Broad material portfolio",3]-1),2)`% higher than population average) and material coloring solutions (`r round(100*(cluster_profile_ratios["MAXDIFF: Material coloring solutions",3]-1),2)`% higher than population average). May be because their need of products are diversed and therefore, they rate less for fixed material price (check below). As support oriented clients, they are more interested to collaborate during innovation process (`r round(100*(cluster_profile_ratios["MAXDIFF: Collaboration during your innovation process",3]-1),2)`% higher than population average) than collaboration for growth (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Collaboration for growth",3]),2)`% lower than population average). 
 
-They definitely are cash rish clients. They rate generally lower than population average for cost related needs such as total system cost reduction (`r round(1-cluster_profile_ratios["MAXDIFF: Total system cost reduction",3],2)`% lower than population average) and formula based or fixed material price (`r round(1-cluster_profile_ratios["MAXDIFF: Formula based or fixed material price",3],2)`% lower than population average). They do not need credit limit, financing and payment terms (`r round(1-cluster_profile_ratios["MAXDIFF: Credit limit. financing and payment terms",3],2)`% lower than population average). This segment of clients paid premium the most among all the segments (`r round(cluster_profile_ratios["Paid premium in past",3]-1,2)`% higher than population average) and least willing to change supplier (`r round(1-cluster_profile_ratios["Willing to Changing suppliers",3],2)`% lower than population average).
+They definitely are cash rish clients. They rate generally lower than population average for cost related needs such as total system cost reduction (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Total system cost reduction",3]),2)`% lower than population average) and formula based or fixed material price (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Formula based or fixed material price",3]),2)`% lower than population average). They do not need credit limit, financing and payment terms (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Credit limit. financing and payment terms",3]),2)`% lower than population average). This segment of clients paid premium the most among all the segments (`r round(100*(cluster_profile_ratios["Paid premium in past",3]-1),2)`% higher than population average) and least willing to change supplier (`r round(100*(1-cluster_profile_ratios["Willing to Changing suppliers",3]),2)`% lower than population average).
 
 #### Step 8. Assess the robustness of our clusters
 
 We will skip this step for this exercise. However in practice this is a very important step. 
 
 
-Intepretation, Decisions and Conclusion
-----------------------------------------------------------------
+### Classification
 
-YOUR TEXT HERE....
-
-
-
-
-Boats Segmentation: Cluster Analysis
-
-========================================================
-
-**Team names**
-
-
-Business Decisions
----------------------------------------------------------
-
-your text...
-
-
-
-The Data
---------------------------------------------
-
-
-Your text...
-
-With the aid of a market research firm, the boating company gathered various data about the boating market in the US through interviews with almost 3,000 boat owners and intenders. The data consisted, among others, of 29 attitudes towards boating, which respondents indicated on a 5-point scale. They are listed below. Other types of information had been collected, such as demographics as well as information about the boats, such as the length of the boat they owned, how they used their boats, and the price of the boats. 
-
-After analyzing the survey data (using for example factor and cluster analysis), the company managers decided to only focus on a few purchase drivers which they thought were the most important ones. They decided to perform the classification and purchase drivers analysis using only the responses to the following questions:
-
-
-Let's get the data and see it for a few customers. This is how the first `r min(max_data_report, nrow(ProjectData))` out of the total of `r nrow(ProjectData)` rows look:
-<br>
-
-
-<div class="row">
-<div class="col-md-6">
-```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
-show_data = data.frame(round(ProjectData,2))
-show_data = show_data[1:min(max_data_report,nrow(show_data)),]
-row<-rownames(show_data)
-dfnew<-cbind(row,show_data)
-change<-colnames(dfnew)
-change[1]<-"Variables"
-colnames (dfnew)<-change
-m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=400,allowHTML=TRUE,page='disable'))
-print(m1,'chart')
-```
-</div>
-</div>
-<br> <br>
-
-Our Approach
----------------------------------------------------------------
-
-There is *not a single best* process for classification. However, we have to start somewhere, so we will use the following process:
+After analyzing the survey data (using factor and cluster analysis), we decided to only focus on the second segment : **"Entry level clients"** which they thought were the most important ones. They decided to perform the classification and drivers analysis using only the responses to the behavioral questions to develop a modal for placing specific customer or client in the selected segment.
 
 #### Classification in 6 steps
 
+We will follow the 6 steps as below for classification.
+
+1. Create an estimation sample and two validation samples by splitting the data into three groups. Steps 2-5 below will then be performed only on the estimation and the first validation data. You should only do step 6 once on the second validation data, also called **test data**, and report/use the performance on that (second validation) data only to make final business decisions. 
+
+2.  Set up the dependent variable (as a categorical 0-1 variable; multi-class classification is also feasible, and similar, but we do not explore it in this note). 
+
+3. Make a preliminary assessment of the relative importance of the explanatory variables using visualization tools and simple descriptive statistics. 
+
+4.  Estimate the classification model using the estimation data, and interpret the results.
+
+5. Assess the accuracy of classification in the first validation sample, possibly repeating steps 2-5 a few times in different ways to increase performance.
+
+6. Finally, assess the accuracy of classification in the second validation sample.  You should eventually use/report all relevant performance measures/plots on this second validation sample only.
 
 #### Step 1: Splitting the data into estimation and validation samples
 
