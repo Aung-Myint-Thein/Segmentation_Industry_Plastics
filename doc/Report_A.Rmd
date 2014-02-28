@@ -14,17 +14,19 @@ Market Segmentation for a B2B Company
 **Aung Myint Thein (INSEAD eLab)**
 
 
-## Introduction
+### Introduction
 
 The client is the second largest global diversified chemical company in the world, with over $50 billion in revenue.  The client manufactures chemicals, fertilizers, metals, and plastics in more than 60 locations around the world. The clients' innovative plastics business is committed to collaborating with customers to leverage the extensive product portfolio of thermoplastic resins, coatings, specialty compounds, film, and sheet materials as well as the broad industry expertise.
 
 This report will analyze the data to identify key input variables for the segmentation using through factor analysis using `r estimation_data_percent`% of the provided data. After analyzing with factor analysis and cluster analysis, I will provide (2-5) segments which represent clusters with specific and differential needs. After that, I will use classification to develop a modal for placing specific customer in one of the segments and will provide the accuracy of the modal with hit ratios, confusion matrix, ROC curves, Lift curves, and Profit curves. Finally, I will access the accuracy of the modal using `r test_data_percent`% of the data and will recommend what additional data should be gathered in a possible new customer survey.
 
-## Executive Summary of the findings
+### Executive Summary of the findings
 
-To be written after everything.. da da da
+To be written after everything.
 
-## Customer survey outline
+### Factor Analysis
+
+#### Customer survey outline
 
 In 2013 the company held a customer survey to understand the needs for companies to select a plastics material supplier. In total almost 1800 customers were interviewed. However, after removing the missing data, our analysis will be based on `r nrow(ProjectData)` rows of data.
 
@@ -93,7 +95,7 @@ print(m1,'chart')
 </div>
 <br>
 
-### Checking the data
+#### Checking the data
 
 After going through several iterations, I have decided to use customer needs for factor analysis. We can see the descriptive statistics of the data as following.
 
@@ -124,7 +126,7 @@ ProjectDatafactor_scaled=apply(ProjectDataFactor,2, function(r) {if (sd(r)!=0) r
 However, note that for this data, all customer needs survey data are on a similar scale. So, I have decided **not to standardize the data and to use original values.** 
 <br>
 
-### Check correlation matrix to see if Factor Analysis makes sense
+#### Check correlation matrix to see if Factor Analysis makes sense
 
 The type of dimensionality reduction methods we will use here "groups together raw attributes that are highly correlated". Other methods (there are many!) use different criteria to create derived variables.  For this to be feasible, it is necessary that the original raw attributes do have large enough correlations (e.g. more than 0.5 in absolute value, or simply statistically significant). It is therefore useful to see the correlation matrix of the original attributes - something that one should anyway always do in order to develop a better understanding of the data. 
 
@@ -141,7 +143,7 @@ cat(renderHeatmapX(thecor, border=1, center = 0,vrange_up = 1, vrange_down = 1))
 
 There are quite a few large (in absolute value) correlations. Therefore, we will proceed to factor analysis.
 
-### Factor Analysis
+#### Factor Analysis
 
 There are many statistical methods to generate derived variables from raw data. One of the most standard ones is **Principal Component Analysis**. This method finds factors, called **Principal Components**, which are **linear combinations of the original raw attributes** so that most of the information in the data, measured using  **variance explained** (roughly "how much of the variability in the data is captured by the selected components") is captured by only a few factors. The components are developed typically so that they are **uncorrelated**, leading to *at most as many factors as the number of the original raw attributes, but* so that only a few are needed (the *principal compontents*) to keep most of the information (variance/variability) in the raw data. For example, for our data we have `r ncol(ProjectData)` raw attributes hence we can only have a total of `r ncol(ProjectData)` factors/compontents, each of them being a linear combination of the `r ncol(ProjectData)` original raw data. 
 
@@ -208,7 +210,7 @@ if (factor_selectionciterion == "manual")
 
 Although they are statistical rules, I have decided to use `r factors_selected` components. The main reason is that up to `r sum(Variance_Explained_Table_copy[,1] >= 1)` components, which has eigenvalue larger than 1, can cover only `r round(Variance_Explained_Table_copy[sum(Variance_Explained_Table_copy[,1] >= 1), "cumulative percentage of variance"], 2)`% of the variance. By having `r factors_selected` components, I can cover up to `r round(Variance_Explained_Table_copy[factors_selected, "cumulative percentage of variance"], 2)`% of the variance which I believe is a more appropriate to do further analysis.
 
-### Interpretation of the factors
+#### Interpretation of the factors
 
 In practice one would like to have derived variables that use only a few of the original raw attributes - while each new derived variable using different subsets of the original raw attributes. Unfortunately this is not necessarily always the case. However, there are mathematical methods, called "factor **rotations**", which transform the estimated factors into new ones which capture exactly the same information from the raw data but use only few non-overlaping raw attributes. One such rotation often used in practice is called the `r rotation_used` rotation - but others are also available. 
 
@@ -265,7 +267,7 @@ To interpret the selected factors, we often use three **Factor Technical Quality
 
 3. Any pair of factors (columns) should have different "patterns" of loading
 
-### Save factor scores for subsequent analysis
+#### Save factor scores for subsequent analysis
 
 For simplicity, we can represent each selected factor using one of the original raw attributes, typically the one on which the factor has the highest loading on. Although it may help with the interpretation of subsequent analysis, this is not statistically as accurate. If we decide to use simple method, we would need to use following variables :
 
@@ -291,7 +293,6 @@ For our data, using the rotated factors we selected, we can create a new dataset
 
 <div class="row">
 <div class="col-md-6">
-
 ```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
 NEW_ProjectData <- round(Rotated_Results$scores[,1:factors_selected,drop=F],2)
 colnames(NEW_ProjectData)<-paste("Derived Variable (Factor)",1:ncol(NEW_ProjectData),sep=" ")
@@ -321,9 +322,9 @@ if(use_factor_scores) {
 </div>
 <br>
 
-## Boats Segmentation: Cluster Analysis
+### Clustering and Segmentation
 
-### Clustering and Segmentation in 9 steps
+We will follow the 9 steps for the cluster analysis as below.
 
 1. Confirm the data in metric 
 
@@ -644,7 +645,9 @@ Most importantly, they paid premium in the past (`r round(cluster_profile_ratios
 
 **3. Support oriented and cash rich clients**
 
-TEXT
+These customers are support oriented and cash rich clients and they are total `r nrow(ProjectData[ProjectData[,"Cluster_Membership"]==3,])` clients (`r round(100*nrow(ProjectData[ProjectData[,"Cluster_Membership"]==3,])/nrow(ProjectData), 2)`% of whole dataset). They rate highly generally on support related questions such as material selection support (`r round(cluster_profile_ratios["MAXDIFF: Material selection support",3]-1,2)`% higher than population average), processing support (`r round(cluster_profile_ratios["MAXDIFF: Processing support",3]-1,2)`% higher than population average), and application development support (`r round(cluster_profile_ratios["MAXDIFF: Application development support",3]-1,2)`% higher than population average). Interestingly, they need supplier with significantly broad material portfolio (`r round(cluster_profile_ratios["MAXDIFF: Broad material portfolio",3]-1,2)`% higher than population average) and material coloring solutions (`r round(cluster_profile_ratios["MAXDIFF: Material coloring solutions",3]-1,2)`% higher than population average). May be because their need of products are diversed and therefore, they rate less for fixed material price (check below). As support oriented clients, they are more interested to collaborate during innovation process (`r round(cluster_profile_ratios["MAXDIFF: Collaboration during your innovation process",3]-1,2)`% higher than population average) than collaboration for growth (`r round(1-cluster_profile_ratios["MAXDIFF: Collaboration for growth",3],2)`% lower than population average). 
+
+They definitely are cash rish clients. They rate generally lower than population average for cost related needs such as total system cost reduction (`r round(1-cluster_profile_ratios["MAXDIFF: Total system cost reduction",3],2)`% lower than population average) and formula based or fixed material price (`r round(1-cluster_profile_ratios["MAXDIFF: Formula based or fixed material price",3],2)`% lower than population average). They do not need credit limit, financing and payment terms (`r round(1-cluster_profile_ratios["MAXDIFF: Credit limit. financing and payment terms",3],2)`% lower than population average). This segment of clients paid premium the most among all the segments (`r round(cluster_profile_ratios["Paid premium in past",3]-1,2)`% higher than population average) and least willing to change supplier (`r round(1-cluster_profile_ratios["Willing to Changing suppliers",3],2)`% lower than population average).
 
 #### Step 8. Assess the robustness of our clusters
 
