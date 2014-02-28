@@ -636,11 +636,15 @@ Since they are already matured, clients from this segment do not care and need s
 
 **2. Entry level clients**
 
-thtiadcasdc dcasd 
+These customers are entry level business and they are total `r nrow(ProjectData[ProjectData[,"Cluster_Membership"]==2,])` clients (`r round(100*nrow(ProjectData[ProjectData[,"Cluster_Membership"]==2,])/nrow(ProjectData), 2)`% of whole dataset). Since they are entry level businesses, they are willing to collaborate for growth (`r round(cluster_profile_ratios["MAXDIFF: Collaboration for growth",2]-1,2)`% higher than population average) and they needs their supplier support towards their sustainabile goals (`r round(cluster_profile_ratios["MAXDIFF: Support towards your sustainability goals",2]-1,2)`% higher than population average). Being an entry level businesses, they also want dedicated account manager relationship (`r round(cluster_profile_ratios["MAXDIFF: Account manager relationship",2]-1,2)`% higher than population average) and they need their supplier to have a strong business services (`r round(cluster_profile_ratios["MAXDIFF: Business services",2]-1,2)`% higher than population average) and global service and operations (`r round(cluster_profile_ratios["MAXDIFF: Global service and operations",2]-1,2)`% higher than population average). 
+
+Strangely, they are not very much interested in material coloring solutions (`r round(1-cluster_profile_ratios["MAXDIFF: Material coloring solutions",2],2)`% lower than population average) and broad material portfolio (`r round(1-cluster_profile_ratios["MAXDIFF: Broad material portfolio",2],2)`% lower than population average). This may be because they are entry level businesses and they still do not need sophisticated and advanced services.
+
+Most importantly, they paid premium in the past (`r round(cluster_profile_ratios["Paid premium in past",2]-1,2)`% higher than population average) and therefore, they are valuable customers. However, they have highest average score in "willing to change supplier" with `r round(cluster_profile_ratios["Willing to Changing suppliers",2],2)` among all segments. So, we need to pay more attention to this segments and our subsequent analysis will be based on this segment.
 
 **3. Support oriented and cash rich clients**
 
-ascdasdcasdcasd
+TEXT
 
 #### Step 8. Assess the robustness of our clusters
 
