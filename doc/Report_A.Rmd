@@ -1585,5 +1585,3 @@ LineFramev3   <- gvisLineChart(frame, xvar=c("xaxis"), yvar="yaxis", options=lis
 print(LineFramev3,'chart')
 ```
 </div>
-
-YOUR TEXT/INTERPRETATION
