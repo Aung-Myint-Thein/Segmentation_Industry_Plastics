@@ -352,14 +352,14 @@ In our case the data are metric, so we continue to the next step.
 ```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
 
 if(use_factor_scores) {
-  print("Since we have decided to use the factor scores, we don't need to scale the data again. We can see from the following descriptive statistics that all the factor scores have standard deviation 1 and mean 0 which is the best case for us.")
+  text_to_print <- "Since we have decided to use the factor scores, we don't need to scale the data again. We can see from the following descriptive statistics that all the factor scores have standard deviation 1 and mean 0 which is the best case for us."
 }else{
-  print("Although we have decided to use original variables, we don't need to scale the data again. We can see from the following descriptive statistics that all the used variables for cluster analysis don't have high difference in range and scale.")
+  text_to_print <- "Although we have decided to use original variables, we don't need to scale the data again. We can see from the following descriptive statistics that all the used variables for cluster analysis don't have high difference in range and scale."
 }
 
 ```
 
-<br>
+`r text_to_print`
 
 <div class="row">
 <div class="col-md-6">
@@ -383,16 +383,18 @@ print(m1,'chart')
 ```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
 
 if(use_factor_scores) {
-  print("Currently, we have decided to use the factor scores from factor analysis above which is statistically more accurate.")
+  text_to_print <- "Currently, we have decided to use the factor scores from factor analysis above which is statistically more accurate."
 }else{
-  print("Currently, we have decided to use the original variable scores which has the highest loadings in each component in factor analysis above. Although this is not statistically accurate, this can be helpful in intrepretations of subsequent analysis.")
+  text_to_print <- "Currently, we have decided to use the original variable scores which has the highest loadings in each component in factor analysis above. Although this is not statistically accurate, this can be helpful in intrepretations of subsequent analysis."
 }
 
 ```
 
+`r text_to_print`
+
 #### Step 4. Define similarity or dissimilarity measures between observations
 
-In our case we explore two distance metrics: the commonly used **Euclidean distance** as well as ** Manhattan distance**. 
+In our case we explore two distance metrics: the commonly used **Euclidean distance** as well as **Manhattan distance**. 
 
 The Euclidean distance between two observations (in our case, customers) is simply the square root of the average of the square difference between the attributes of the two observations (in our case, customers). For example, the distance of the first customer in our data from customers 2-5 (summarized above), using their responses to the 6 attitudinal questions is:
 
@@ -430,37 +432,12 @@ In general a lot of creative thinking and exploration should be spent in this st
 
 #### Step 5. Visualize Individual Attributes and  Pair-wise Distances between the Observations
 
-
-For example, in our case we can see the histogram of, say, the first 4 variables:
-
-```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, echo=FALSE, error=FALSE, fig.align='center', results='asis'}
-
-if (0){
-  
-  ProjectDataframe = data.frame(ProjectData_segment[,1:min(4,ncol(ProjectData_segment))])
-  V1 <- ggplot() + geom_bar(aes(y = ..count.., x = V1),data=ProjectDataframe) + ylab(label = 'Frequency') + xlab(label = 'Histogram of Variable 1') + theme_grey()
-  V2 <- ggplot() + geom_bar(aes (y = ..count.., x = V2),data=ProjectDataframe) + ylab(label = 'Frequency') + xlab(label = 'Histogram of Variable 2') + theme_grey()
-  V3 <- ggplot() + geom_bar(aes (y = ..count.., x = V3),data=ProjectDataframe) + ylab(label = 'Frequency') + xlab(label = 'Histogram of Variable 3') + theme_grey()
-  V4 <- ggplot() + geom_bar(aes (y = ..count.., x = V4),data=ProjectDataframe) + ylab(label = 'Frequency') + xlab(label = 'Histogram of Variable 4') + theme_grey()
-  grid.arrange(V1, V2, V3, V4)
-  
-  }
-
-```
-
-or the histogram of all pairwise distances for the `r distance_used` distance:
-
+The histogram of all pairwise distances for the `r distance_used` distance:
 
 ```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, fig.align='center', results='asis'}
 Pairwise_Distances <- dist(ProjectData_segment, method = distance_used) 
 hist(Pairwise_Distances, main = NULL, xlab="Histogram of all pairwise Distances between observtions", ylab="Frequency")
 ```
-
-<blockquote> <p>
-Visualization is very important for data analytics, as it can provide a first understanding of the data.
-</p> </blockquote>
-
-<br> 
 
 #### Step 6. Select the clustering method to use and decide how many clusters to have
 
