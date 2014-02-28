@@ -622,23 +622,23 @@ cat(renderHeatmapX(cluster_profile_ratios, border=1, center = 1, minvalue = heat
 
 From above table and snake plot, we can easily see that segments appear distinct with one high, one medium, and one low impact segment per specific needs. Based on this cluster analysis, we can define customer segments as :
 
-1. Mature customers
-2. Entry level customers
-3. Support oriented and cash rich customers
+1. Matured clients
+2. Entry level clients
+3. Support oriented and cash rich clients
 
 Using the table above, we can describe the specific and differentiated needs of segments as following :
 
-1. **Mature customers**
+**1. Matured clients**
 
-These customers are mature businesses. They needs their supplier to have an efficient and reliable ordering process (`r round(cluster_profile_ratios["MAXDIFF: Efficient and reliable ordering process",1]-1,2)`% higher than population average), delivery & inventory management (`r round(cluster_profile_ratios["MAXDIFF: Delivery &amp; inventory management",1]-1,2)`% higher than population average), and formula based or fixed material price (`r round(cluster_profile_ratios["MAXDIFF: Formula based or fixed material price",1]-1,2)`% higher than population average). This shows that they are more mature and process based clients and they want certainty and predictability in their cost. This is strengthened more by having `r round(cluster_profile_ratios["MAXDIFF: Credit limit. financing and payment terms",1]-1,2)` percent higher than population average in needs of credit limit, financing and payment terms and the highest among 3 segments.
+These customers are mature businesses and there are total `r nrow(ProjectData[ProjectData[,"Cluster_Membership"]==1,])` clients (`r round(100*nrow(ProjectData[ProjectData[,"Cluster_Membership"]==1,])/nrow(ProjectData), 2)`% of whole dataset). They needs their supplier to have an efficient and reliable ordering process (`r round(cluster_profile_ratios["MAXDIFF: Efficient and reliable ordering process",1]-1,2)`% higher than population average), delivery & inventory management (`r round(cluster_profile_ratios["MAXDIFF: Delivery &amp; inventory management",1]-1,2)`% higher than population average), and formula based or fixed material price (`r round(cluster_profile_ratios["MAXDIFF: Formula based or fixed material price",1]-1,2)`% higher than population average). This shows that they are more mature and process based clients and they want certainty and predictability in their cost. This is strengthened more by having `r round(cluster_profile_ratios["MAXDIFF: Credit limit. financing and payment terms",1]-1,2)` percent higher than population average in needs of credit limit, financing and payment terms and the highest among 3 segments.
 
 Since they are already matured, clients from this segment do not care and need so much of collaboration for growth (`r round(1-cluster_profile_ratios["MAXDIFF: Collaboration for growth",1],2)`% lower than population average), global service and operations (`r round(1-cluster_profile_ratios["MAXDIFF: Global service and operations",1],2)`% lower than population average), business services (`r round(1-cluster_profile_ratios["MAXDIFF: Business services",1],2)`% lower than population average). They seem to know of what they want as they do not need their supplier to have broad material portfolio (`r round(1-cluster_profile_ratios["MAXDIFF: Broad material portfolio",1],2)`% lower than population average).
 
-2. **Entry level customers**
+**2. Entry level clients**
 
 thtiadcasdc dcasd 
 
-3. **Support oriented and cash rich customers**
+**3. Support oriented and cash rich clients**
 
 ascdasdcasdcasd
 
