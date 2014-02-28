@@ -656,7 +656,28 @@ We will skip this step for this exercise. However in practice this is a very imp
 
 ### Classification
 
-After analyzing the survey data (using factor and cluster analysis), we decided to only focus on the second segment : **"Entry level clients"** which they thought were the most important ones. They decided to perform the classification and drivers analysis using only the responses to the behavioral questions to develop a modal for placing specific customer or client in the selected segment.
+After analyzing the survey data (using factor and cluster analysis), we decided to only focus on the second segment : **"Entry level clients"** which they thought were the most important ones. They decided to perform the classification and drivers analysis using only the responses to the behavioral questions to develop a modal for placing specific customer or client in the selected segment as following :
+
+1. "Willing to Changing suppliers"                            
+2. "Willing to Give more business"                            
+3. "Willing to Recommend to others"                           
+4. "Willing to Specify as supplier of choice"                 
+5. "Willing to Pay for consulting services"                   
+6. "Willing to Pay price premium"                             
+7. "Changed material suppliers in past"                       
+8. "Given more business in past"                              
+9. "Recommended to others in past"                            
+10. "Specify as supplier of choice in past"                    
+11. "Paid for consulting services in past"                     
+12. "Paid premium in past"                                     
+13. "Will - Order large quantity for lower price"              
+14. "Will accept - No sales rep for lower price"               
+15. "Will accept - Cancellation fees for lower price"          
+16. "Will accept - Longer lead times for lower price"          
+17. "Will accept - Broader materials specs for lower price"    
+18. "Will - Use own transportation for lower price"            
+19. "Will - Allocate more spending to supplier for lower price"
+20. "Will - Give up support for lower price"      
 
 #### Classification in 6 steps
 
@@ -676,12 +697,18 @@ We will follow the 6 steps as below for classification.
 
 #### Step 1: Splitting the data into estimation and validation samples
 
-You text...
+Since we are using variables with different scales for independent variables, we normalized our data using as following:
+
+```{r, results='asis'}
+ProjectDatafactor_Example <- apply(ProjectData,2, function(r) {if (sd(r)!=0) res=(r-mean(r))/sd(r) else res=0*r; res})
+```
+
 
 ```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='hide'}
 ## use normalized scores for classifications
 ProjectData_S <- apply(ProjectData,2, function(r) {if (sd(r)!=0) res=(r-mean(r))/sd(r) else res=0*r; res})
-ProjectData <- cbind(ProjectData_S[, -(45:46)], ProjectData[, 45:46])
+## retain the company number, sys respum, cluster membership and cluster test
+ProjectData <- cbind(ProjectData[, 1:2], ProjectData_S[, -c(1,2,45,46)], ProjectData[, 45:46])
 
 if (random_sampling){
   estimation_data_ids=sample.int(nrow(ProjectData),floor(estimation_data_percent*nrow(ProjectData)/100))
@@ -700,21 +727,37 @@ validation_data=ProjectData[validation_data_ids,]
 test_data=ProjectData[test_data_ids,]
 ```
 
+We will use `r estimation_data_percent`% of the dataset as estimation data (`r nrow(estimation_data)` observations), `r validation_data_percent`% of the dataset as validation data (`r nrow(validation_data)` observations), and `r test_data_percent`% as test data (`r nrow(test_data)` observations). 
 
-In our case we use for example `r nrow(estimation_data)` observations in the estimation data, 
-`r nrow(validation_data)` in the validation data, and `r nrow(test_data)` in the test data. 
-
+<br>
 
 #### Step 2: Setting up the dependent variable
 
+We have merged the original dataset with cluster memerships from kmeans clustering. After that, we added one more variable at the end with the name **cluster test** which will have 1 for cluster number we want to use for classification and 0 for other clusters. Following is the first  `r max_data_report` rows of estimation data. Please go to the right end of the table to see the cluster membership and cluster test variable example.
 
-Your text...
-
-In our data the number of 0/1's in our estimation sample is as follows:
 <div class="row">
 <div class="col-md-6">
 ```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
-class_percentages=matrix(c(sum(estimation_data[,dependent_variable]==1),sum(estimation_data[,dependent_variable]==0)), nrow=1); colnames(class_percentages)<-c("Class 1", "Class 0")
+show_data = data.frame(round(estimation_data,2))
+show_data = show_data[1:min(max_data_report,nrow(show_data)),]
+row<-rownames(show_data)
+dfnew<-cbind(row,show_data)
+change<-colnames(dfnew)
+change[1]<-"No."
+colnames (dfnew)<-change
+m1<-gvisTable(dfnew, options=list(showRowNumber=F,width=1220, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
+print(m1,'chart')
+```
+</div>
+</div>
+
+
+In our data, the number of 0/1's in our estimation sample is as follows:
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
+class_percentages=matrix(c(sum(estimation_data[,dependent_variable]==1),sum(estimation_data[,dependent_variable]==0)), nrow=1)
+colnames(class_percentages)<-c(paste("Class 1 (Cluster ", Cluster_to_test, ")", sep=""), "Class 0 (Other clusters)")
 rownames(class_percentages)<-"# of Observations"
 print(xtable(class_percentages ,caption="Number of Observations per class in the Estimation Sample", digits=1,),type="html",html.table.attributes = "class='table table-striped table-hover table-bordered'",caption.placement="top",comment = FALSE,include.rownames = TRUE)
 ```
@@ -726,7 +769,8 @@ while in the validation sample they are:
 <div class="row">
 <div class="col-md-6">
 ```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
-class_percentages=matrix(c(sum(validation_data[,dependent_variable]==1),sum(validation_data[,dependent_variable]==0)), nrow=1); colnames(class_percentages)<-c("Class 1", "Class 0")
+class_percentages=matrix(c(sum(validation_data[,dependent_variable]==1),sum(validation_data[,dependent_variable]==0)), nrow=1)
+colnames(class_percentages)<-c(paste("Class 1 (Cluster ", Cluster_to_test, ")", sep=""), "Class 0 (Other clusters)")
 rownames(class_percentages)<-"# of Observations"
 print(xtable(class_percentages ,caption="Number of Observations per class in the Validation Sample", digits=1,),type="html",html.table.attributes = "class='table table-striped table-hover table-bordered'",caption.placement="top",comment = FALSE,include.rownames = TRUE)
 ```
