@@ -62,7 +62,7 @@ segmentation_attributes_used = c(9,8,11,18,12,14,15,21,22,16)
 
 # Please ENTER then original raw attributes to use for the profiling of the segments (the "profiling attributes")
 # Please use numbers, not column names! e.g. c(1:5, 7, 8) uses columns 1,2,3,4,5,7,8
-profile_attributes_used = c(3:44) # for boats use c(2:82), for Mall_Visits use c(2:9)
+profile_attributes_used = c(3:44)
 
 # Please ENTER the number of clusters to eventually use for this report
 numb_clusters_used = 3 # for boats possibly use 5, for Mall_Visits use 3
