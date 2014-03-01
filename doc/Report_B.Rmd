@@ -1,0 +1,1631 @@
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+<style type="text/css"> body {padding: 10px 30px 10px 30px;} table,th, td {text-align: center;}</style>
+<style>
+td.tableRow
+{
+text-align:center;
+}
+</style>
+
+
+Market Segmentation for a B2B Company
+========================================================
+
+**Aung Myint Thein (INSEAD eLab)**
+
+
+### Introduction
+
+The client is the second largest global diversified chemical company in the world, with over $50 billion in revenue.  The client manufactures chemicals, fertilizers, metals, and plastics in more than 60 locations around the world. The clients' innovative plastics business is committed to collaborating with customers to leverage the extensive product portfolio of thermoplastic resins, coatings, specialty compounds, film, and sheet materials as well as the broad industry expertise.
+
+This report will analyze the data to identify key input variables for the segmentation using through factor analysis using `r estimation_data_percent`% of the provided data. After analyzing with factor analysis and cluster analysis, I will provide (2-5) segments which represent clusters with specific and differential needs. After that, I will use classification to develop a modal for placing specific customer in one of the segments and will provide the accuracy of the modal with hit ratios, confusion matrix, ROC curves, Lift curves, and Profit curves. Finally, I will access the accuracy of the modal using `r test_data_percent`% of the data and will recommend what additional data should be gathered in a possible new customer survey.
+
+### Executive Summary of the findings
+
+To be written after everything.
+
+### Factor Analysis
+
+#### Customer survey outline
+
+In 2013 the company held a customer survey to understand the needs for companies to select a plastics material supplier. In total almost 1800 customers were interviewed. However, after removing the missing data, our analysis will be based on `r nrow(ProjectData)` rows of data.
+
+The survey results are provided anonymously in the excel file. Customer names and specific customer needs are not mentioned. The data set does include the following variables:
+
+* Data set
+* Respondent number (there could be more than one respondent in one company)
+* Company number
+* Pole (Europe, America, APAC)
+* Type of function of the respondent
+* Place in value chain
+* Max_Diff relative importance of the 20 needs mentioned above (Need_1 to Need_20)
+* Behavioral information (20) 
+
+The behavioral variables are either binary or measured on a 5-point scale:
+
+a.  The 5 point-scale is defined as:
+
+* Very unlikely = 1
+* Unlikely = 2
+* Do not know = 3
+* Likely = 4
+* Very likely = 5
+
+b.  The binary scale is defined as:
+
+* Yes = 1
+* No = 0
+
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
+#let's remove the first 2 rows and make the first row into column_names
+#ProjectData = tail(ProjectData, -3)
+#let's code the "SURVEY_VALUE_CHAIN" column first
+#non_numeric_row = ProjectData[,"V3"]
+#thevalues = unique(non_numeric_row)
+#num_values = rep(0,nrow(ProjectData))
+#for (iter in 1:length(thevalues))
+#  num_values[which(non_numeric_row == thevalues[iter])]<- iter
+#ProjectData[,"V3"] <- num_values
+
+factor_attributes_used = unique(sapply(factor_attributes_used,function(i) min(ncol(ProjectData), max(i,1))))
+ProjectDataFactor=ProjectData[,factor_attributes_used]
+
+# let's make the data into data.matrix classes now so that we can easier visualize them
+ProjectDataFactor = data.matrix(ProjectDataFactor)
+ProjectData = data.matrix(ProjectData)
+```
+
+This is how the first `r min(max_data_report, nrow(ProjectData))` rows of data looks (ignoring the NON-numerical columns):
+<br>
+
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
+show_data = data.frame(round(ProjectData,2))
+show_data = show_data[1:min(max_data_report,nrow(show_data)),]
+row<-rownames(show_data)
+dfnew<-cbind(row,show_data)
+change<-colnames(dfnew)
+change[1]<-"No."
+colnames (dfnew)<-change
+m1<-gvisTable(dfnew, options=list(showRowNumber=F,width=1220, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
+print(m1,'chart')
+```
+</div>
+</div>
+<br>
+
+#### Checking the data
+
+After going through several iterations, I have decided to use customer needs for factor analysis. We can see the descriptive statistics of the data as following.
+
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
+show_data = data.frame(round(my_summary(ProjectDataFactor),2))
+#show_data = show_data[1:min(max_data_report,nrow(show_data)),]
+row<-rownames(show_data)
+dfnew<-cbind(row,show_data)
+change<-colnames(dfnew)
+change[1]<-"Variables"
+colnames (dfnew)<-change
+m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
+print(m1,'chart')
+```
+</div>
+</div>
+<br>
+
+Having some variables with a very different range/scale can often create problems: **most of the "results" may be driven by a few large values**, more so that we would like. To avoid such issues, one has to consider whether or not to **standardize the data** by making some of the initial raw attributes have, for example,  mean  0 and standard deviation 1 (e.g. scaled_low_materaial_price = (low_materaial_price-mean(low_materaial_price))/sd(low_materaial_price) ), or scaling them between 0 and 1 (e.g. scaledlow_materaial_price=(low_materaial_price-min(low_materaial_price))/(max(low_materaial_price)-min(low_materaial_price))). Here is for example the R code for the first approach, if we want to standardize all attributes:
+
+
+```{r, results='asis'}
+ProjectDatafactor_scaled=apply(ProjectDataFactor,2, function(r) {if (sd(r)!=0) res=(r-mean(r))/sd(r) else res=0*r; res})
+```
+
+However, note that for this data, all customer needs survey data are on a similar scale. So, I have decided **not to standardize the data and to use original values.** 
+<br>
+
+#### Check correlation matrix to see if Factor Analysis makes sense
+
+The type of dimensionality reduction methods we will use here "groups together raw attributes that are highly correlated". Other methods (there are many!) use different criteria to create derived variables.  For this to be feasible, it is necessary that the original raw attributes do have large enough correlations (e.g. more than 0.5 in absolute value, or simply statistically significant). It is therefore useful to see the correlation matrix of the original attributes - something that one should anyway always do in order to develop a better understanding of the data. 
+
+Following is the correlation matrix of the `r length(factor_attributes_used)` original variable we use for factor analysis.
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, results='asis'}
+thecor = round(cor(ProjectDataFactor),2)
+colnames(thecor)<-colnames(ProjectDataFactor)
+rownames(thecor)<-colnames(ProjectDataFactor)
+## printing the result in a clean-slate table
+cat(renderHeatmapX(thecor, border=1, center = 0,vrange_up = 1, vrange_down = 1))
+```
+<br>
+
+There are quite a few large (in absolute value) correlations. Therefore, we will proceed to factor analysis.
+
+#### Factor Analysis
+
+There are many statistical methods to generate derived variables from raw data. One of the most standard ones is **Principal Component Analysis**. This method finds factors, called **Principal Components**, which are **linear combinations of the original raw attributes** so that most of the information in the data, measured using  **variance explained** (roughly "how much of the variability in the data is captured by the selected components") is captured by only a few factors. The components are developed typically so that they are **uncorrelated**, leading to *at most as many factors as the number of the original raw attributes, but* so that only a few are needed (the *principal compontents*) to keep most of the information (variance/variability) in the raw data. For example, for our data we have `r ncol(ProjectData)` raw attributes hence we can only have a total of `r ncol(ProjectData)` factors/compontents, each of them being a linear combination of the `r ncol(ProjectData)` original raw data. 
+
+While there are as many (and for other methods, more) factors as the number of original raw attributes, since our goal is to identify key input vartiables or factors, we need to make sure not to lose much information when we use only a few of the components. 
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, results='asis'}
+UnRotated_Results<-principal(ProjectDataFactor, nfactors=ncol(ProjectDataFactor), rotate="none",score=TRUE)
+UnRotated_Factors<-round(UnRotated_Results$loadings,2)
+UnRotated_Factors<-as.data.frame(unclass(UnRotated_Factors))
+colnames(UnRotated_Factors)<-paste("Component",1:ncol(UnRotated_Factors),sep=" ")
+```
+
+When using PCA, we have two measures of "how much of the information (variance in this case) in the original raw data is captured by any of the factors": 
+
+a) the *percentage of variance explained*, 
+
+b) the *eigenvalue coresponding to the compontent*.
+
+Each factor has an eigenvalue as well as the percentage of the variance explained. The sum of the eigenvalues of the components is equal to the number of original raw attributes used for factor analysis, while the sum of the percentages of the variance explained across all components is 100%. For example, for our data these are:
+
+```{r echo=FALSE, comment=NA, warning=FALSE, error=FALSE,message=FALSE,results='asis'}
+Variance_Explained_Table_results<-PCA(ProjectDataFactor, graph=FALSE)
+Variance_Explained_Table<-Variance_Explained_Table_results$eig
+Variance_Explained_Table_copy<-Variance_Explained_Table
+
+
+row=1:nrow(Variance_Explained_Table)
+name<-paste("Component No:",row,sep="")
+Variance_Explained_Table<-cbind(name,Variance_Explained_Table)
+Variance_Explained_Table<-as.data.frame(Variance_Explained_Table)
+colnames(Variance_Explained_Table)<-c("Components", "Eigenvalue", "Percentage_of_explained_variance", "Cumulative_percentage_of_explained_variance")
+
+m<-gvisTable(Variance_Explained_Table,options=list(width=1200, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'),formats=list(Eigenvalue="#.##",Percentage_of_explained_variance="#.##",Cumulative_percentage_of_explained_variance="#.##"))
+print(m,'chart')
+```
+<br>
+
+Two Statistical criteria to select the number of factors/derived variables when using PCA are
+
+1. select components with corresponding eigenvalue larger than 1.
+
+2. Select the components with the highest eigenvalues "up to the component" for which the cumulative total variance explained is relatively large (e.g. more than 50%).
+
+We can also plot the eigenvalues of the generated factors in decreasing order: this plot is called the **scree plot**. An abline is added at the value 1 so that we can easily see how many components will have eigenvalue larger than 1. For our data this plot looks as follows:
+
+```{r Fig1, echo=FALSE, comment=NA, results='asis', message=FALSE, fig.align='center', fig=TRUE}
+
+eigenvalues  <- Variance_Explained_Table[,2]
+df           <- cbind(as.data.frame(eigenvalues), c(1:length(eigenvalues)), rep(1, length(eigenvalues)))
+colnames(df) <- c("eigenvalues", "components", "abline")
+Line         <- gvisLineChart(as.data.frame(df), xvar="components", yvar=c("eigenvalues","abline"), options=list(title='Scree plot', legend="right", width=900, height=600, hAxis="{title:'Number of Components', titleTextStyle:{color:'black'}}", vAxes="[{title:'Eigenvalues'}]",  series="[{color:'green',pointSize:3, targetAxisIndex: 0}]"))
+print(Line, 'chart')
+```
+
+```{r echo=FALSE, comment=NA, warning=FALSE,message=FALSE,results='asis'}
+## setting for number of factors
+if (factor_selectionciterion == "eigenvalue")
+  factors_selected = sum(Variance_Explained_Table_copy[,1] >= 1)
+if (factor_selectionciterion == "variance")
+  factors_selected = 1:head(which(Variance_Explained_Table_copy[,"cumulative percentage of variance"]>= minimum_variance_explained),1)
+if (factor_selectionciterion == "manual")
+  factors_selected = manual_numb_factors_used
+```
+
+Although they are statistical rules, I have decided to use `r factors_selected` components. The main reason is that up to `r sum(Variance_Explained_Table_copy[,1] >= 1)` components, which has eigenvalue larger than 1, can cover only `r round(Variance_Explained_Table_copy[sum(Variance_Explained_Table_copy[,1] >= 1), "cumulative percentage of variance"], 2)`% of the variance. By having `r factors_selected` components, I can cover up to `r round(Variance_Explained_Table_copy[factors_selected, "cumulative percentage of variance"], 2)`% of the variance which I believe is a more appropriate to do further analysis.
+
+#### Interpretation of the factors
+
+In practice one would like to have derived variables that use only a few of the original raw attributes - while each new derived variable using different subsets of the original raw attributes. Unfortunately this is not necessarily always the case. However, there are mathematical methods, called "factor **rotations**", which transform the estimated factors into new ones which capture exactly the same information from the raw data but use only few non-overlaping raw attributes. One such rotation often used in practice is called the `r rotation_used` rotation - but others are also available. 
+
+For our data, the `r factors_selected` selected factors look as follows after the `r rotation_used` rotation: 
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
+
+Rotated_Results<-principal(ProjectDataFactor, nfactors=max(factors_selected), rotate=rotation_used, score=TRUE)
+Rotated_Factors<-round(Rotated_Results$loadings,2)
+Rotated_Factors<-as.data.frame(unclass(Rotated_Factors))
+colnames(Rotated_Factors)<-paste("Component",1:ncol(Rotated_Factors),sep=" ")
+
+sorted_rows <- sort(Rotated_Factors[,1], decreasing = TRUE, index.return = TRUE)$ix
+Rotated_Factors <- Rotated_Factors[sorted_rows,]
+
+show_data <- Rotated_Factors 
+#show_data = show_data[1:min(max_data_report,nrow(show_data)),]
+row<-rownames(show_data)
+dfnew<-cbind(row,show_data)
+change<-colnames(dfnew)
+change[1]<-"Variables"
+colnames (dfnew)<-change
+m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
+print(m1,'chart')
+```
+<br> <br>
+
+To better visualize and interpret the factors we often "supress" loadings with small values, e.g. with absolute values smaller than `r MIN_VALUE`. In this case our factors look as follows after suppressing the small numbers:
+
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
+Rotated_Factors_thres <- Rotated_Factors
+Rotated_Factors_thres[abs(Rotated_Factors_thres) < MIN_VALUE]<-NA
+colnames(Rotated_Factors_thres)<- colnames(Rotated_Factors)
+rownames(Rotated_Factors_thres)<- rownames(Rotated_Factors)
+
+show_data <- Rotated_Factors_thres 
+#show_data = show_data[1:min(max_data_report,nrow(show_data)),]
+row<-rownames(show_data)
+dfnew<-cbind(row,show_data)
+change<-colnames(dfnew)
+change[1]<-"Variables"
+colnames (dfnew)<-change
+m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
+print(m1,'chart')
+```
+<br> <br>
+
+To interpret the selected factors, we often use three **Factor Technical Quality Criteria**:
+
+1. For each factor (column) only a few loadings are large (in absolute value)
+
+2. For each raw attribute (row) only a few loadings are large (in absolute value)
+
+3. Any pair of factors (columns) should have different "patterns" of loading
+
+#### Save factor scores for subsequent analysis
+
+For simplicity, we can represent each selected factor using one of the original raw attributes, typically the one on which the factor has the highest loading on. Although it may help with the interpretation of subsequent analysis, this is not statistically as accurate. If we decide to use simple method, we would need to use following variables :
+
+<div class="row">
+<div class="col-md-4">
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, fig.align='center', results='asis'}
+
+table_to_print <- as.data.frame(colnames(ProjectData[,segmentation_attributes_used]))
+colnames(table_to_print) <- "variable"
+
+m1<-gvisTable(table_to_print,options=list(showRowNumber=T,width=250, height=350,allowHTML=TRUE,page='disable'))
+  print(m1,'chart')
+```
+</div>
+</div>
+
+
+However, once we decided the factors to use, we typically replace the original data with a new dataset where each observation (row) is now described not using the original raw attributes but using instead the selected factors/derived attributes. Afterall this was the goal of this analysis. 
+
+The way to represent our observations using the found derived attributes (factors/components) is to estimate for each observation (row) how it "scores" for each of the selected factor. These numbers are called **factor scores**. Effectively they are the "scores" the observation would take on the factor had we measured that factor directly instead of measuring the original raw attributes. 
+
+For our data, using the rotated factors we selected, we can create a new dataset where our observations are as follows (for the first `r min(max_data_report,nrow(Rotated_Results$scores))` observations):
+
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
+NEW_ProjectData <- round(Rotated_Results$scores[,1:factors_selected,drop=F],2)
+colnames(NEW_ProjectData)<-paste("Derived Variable (Factor)",1:ncol(NEW_ProjectData),sep=" ")
+
+if (factors_selected >=2){ 
+  
+  show_data <- as.data.frame(NEW_ProjectData) 
+  show_data = show_data[1:min(max_data_report,nrow(show_data)),]
+  row<-rownames(show_data)
+  dfnew<-cbind(row,show_data)
+  change<-colnames(dfnew)
+  change[1]<-"Observation"
+  colnames (dfnew)<-change
+  m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
+  print(m1,'chart')
+  
+  } else {
+    print(xtable(NEW_ProjectData, caption="Only 1 derived variable generated", digits=3), type="html",html.table.attributes="class='table table-striped table-hover table-bordered'", caption.placement="top", comment=FALSE, include.rownames=F, include.colnames=TRUE)
+    }
+
+if(use_factor_scores) {
+  ProjectData_segment <- NEW_ProjectData  
+}
+
+```
+</div>
+</div>
+<br>
+
+### Clustering and Segmentation
+
+We will follow the 9 steps for the cluster analysis as below.
+
+1. Confirm the data in metric 
+
+2. Decide whether to scale or standardize the data
+
+3. Decide which variables to use for clustering
+
+4. Define similarity or dissimilarity measures between observations
+
+5. Visualize Individual Attributes and  Pair-wise Distances between the Observations
+
+6. Select the clustering method to use and decide how many clusters to have
+
+7. Profile and interpret the clusters 
+
+8. Assess the robustness of our clusters
+
+Let's follow these steps.
+
+#### Step 1. Confirm the data in metric 
+
+In our case the data are metric, so we continue to the next step.
+
+#### 2. Decide whether to scale or standardize the data
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
+
+if(use_factor_scores) {
+  text_to_print <- "Since we have decided to use the factor scores, we don't need to scale the data again. We can see from the following descriptive statistics that all the factor scores have standard deviation 1 and mean 0 which is the best case for us."
+}else{
+  text_to_print <- "Although we have decided to use original variables, we don't need to scale the data again. We can see from the following descriptive statistics that all the used variables for cluster analysis don't have high difference in range and scale."
+}
+
+```
+
+`r text_to_print`
+
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
+
+show_data = data.frame(round(my_summary(ProjectData_segment),2))
+#show_data = show_data[1:min(max_data_report,nrow(show_data)),]
+row<-rownames(show_data)
+dfnew<-cbind(row,show_data)
+change<-colnames(dfnew)
+change[1]<-"Variables"
+colnames (dfnew)<-change
+m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
+print(m1,'chart')
+```
+</div>
+</div>
+
+#### Step 3. Decide which variables to use for clustering
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
+
+if(use_factor_scores) {
+  text_to_print <- "Currently, we have decided to use the factor scores from factor analysis above which is statistically more accurate."
+}else{
+  text_to_print <- "Currently, we have decided to use the original variable scores which has the highest loadings in each component in factor analysis above. Although this is not statistically accurate, this can be helpful in intrepretations of subsequent analysis."
+}
+
+```
+
+`r text_to_print`
+
+#### Step 4. Define similarity or dissimilarity measures between observations
+
+In our case we explore two distance metrics: the commonly used **Euclidean distance** as well as **Manhattan distance**. 
+
+The Euclidean distance between two observations (in our case, customers) is simply the square root of the average of the square difference between the attributes of the two observations (in our case, customers). For example, the distance of the first customer in our data from customers 2-5 (summarized above), using their responses to the 6 attitudinal questions is:
+
+```{r include=FALSE, echo=FALSE, comment=NA, warning=FALSE, message=FALSE}
+euclidean_pairwise <- as.matrix(dist(head(ProjectData_segment, 5), method="euclidean"))
+euclidean_pairwise <- euclidean_pairwise*lower.tri(euclidean_pairwise) + euclidean_pairwise*diag(euclidean_pairwise) + 10e10*upper.tri(euclidean_pairwise)
+euclidean_pairwise[euclidean_pairwise==10e10] <- NA
+```
+
+<div class="row">
+<div class="col-md-4">
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, fig.align='center', results='asis'}
+print(xtable(euclidean_pairwise, caption="Pairwise Distances between the first 5 observations using The Euclidean Distance Metric", digits=1), type="html", html.table.attributes = "class='table table-striped table-hover table-bordered'", caption.placement="top", comment=FALSE, include.rownames=TRUE)
+```
+</div>
+</div>
+
+Notice for example that if we use, say, the Manhattan distance metric, these distances change as follows:
+
+```{r include=FALSE, echo=FALSE, comment=NA, warning=FALSE, message=FALSE}
+manhattan_pairwise <- as.matrix(dist(head(ProjectData_segment, 5), method="manhattan"))
+manhattan_pairwise <- manhattan_pairwise*lower.tri(manhattan_pairwise) + manhattan_pairwise*diag(manhattan_pairwise) + 10e10*upper.tri(manhattan_pairwise)
+manhattan_pairwise[manhattan_pairwise==10e10] <- NA
+```
+
+<div class="row">
+<div class="col-md-4">
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, fig.align='center', results='asis'}
+print(xtable(manhattan_pairwise, caption="Pairwise Distances between the first 5 observations using The Manhattan Distance Metric", digits=1), type="html", html.table.attributes = "class='table table-striped table-hover table-bordered'", caption.placement="top", comment=FALSE, include.rownames=TRUE)
+```
+</div>
+</div>
+
+In general a lot of creative thinking and exploration should be spent in this step, and as always one may need to come back to this step even after finishing the complete segmentation process - multiple times. 
+
+#### Step 5. Visualize Individual Attributes and  Pair-wise Distances between the Observations
+
+The histogram of all pairwise distances for the `r distance_used` distance:
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, fig.align='center', results='asis'}
+Pairwise_Distances <- dist(ProjectData_segment, method = distance_used) 
+hist(Pairwise_Distances, main = NULL, xlab="Histogram of all pairwise Distances between observtions", ylab="Frequency")
+```
+
+#### Step 6. Select the clustering method to use and decide how many clusters to have
+
+We will explore two widely used methods: **Hierarchical Clustering Method** and **Kmeans Clustering Method**. Like all clustering methods, these two also require that we have decided how to measure the distance/similarity between our observations. The only difference to highlight is that Kmeans requires the user to define how many segments to create, while Hierarchical Clustering does not.
+
+**Hierarchial Clustering**
+
+When we do not know how many segments there are in our data, hierarchical clustering is a  method that also helps us visualise how the data may be clustering together. It generates a plot called the **Dendrogram** which is often helpful for visualization - but should be used with care. For example, in this case the dendrogram, using the `r distance_used` distance metric from the earlier steps and the ``r hclust_method` hierarchical clustering option (see below as well as help(hclust) in R for more information), is as follows:
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, fig.align='center', results='asis'}
+Hierarchical_Cluster_distances <- dist(ProjectData_segment, method=distance_used)
+Hierarchical_Cluster <- hclust(Hierarchical_Cluster_distances, method=hclust_method)
+# Display dendogram
+plot(Hierarchical_Cluster, main = NULL, sub=NULL, labels = 1:nrow(ProjectData_segment), xlab="Our Observations", cex.lab=1, cex.axis=1) 
+# Draw dendogram with red borders around the 3 clusters
+rect.hclust(Hierarchical_Cluster, k=numb_clusters_used, border="red") 
+```
+
+Note that we can draw as many clusters as we choose (e.g. in this case we chose `r numb_clusters_used` clusters) around the branches of the Dendrogram. We can also plot the "distances" traveled before we need to merge any of the lower and smaller in size clusters into larger ones - the heights of the tree branches that link the clusters as we traverse the tree from its leaves to its root. If we have n observations, this plot has n-1 numbers. 
+
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, fig.align='center', results='asis'}
+max <- nrow(ProjectData)
+num <- max - 1
+df1 <- cbind(as.data.frame(Hierarchical_Cluster$height[length(Hierarchical_Cluster$height):1]), c(1:num))
+colnames(df1) <- c("distances","index")
+Line <- gvisLineChart(as.data.frame(df1), xvar="index", yvar="distances", options=list(title='Distances plot', legend="right", width=900, height=600, hAxis="{title:'Number of Components', titleTextStyle:{color:'black'}}", vAxes="[{title:'Distances'}]", series="[{color:'green',pointSize:3, targetAxisIndex: 0}]"))
+print(Line,'chart')
+```
+
+For now let's consider the `r numb_clusters_used`-segments solution found by the Hierarchical Clustering method (using the `r distance_used` distance and the hclust option `r hclust_method`). We can also see the segment each observation (respondent in this case) belongs to for the first `r min(max_data_report,nrow(ProjectData))` people:
+
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
+cluster_memberships_hclust <- as.vector(cutree(Hierarchical_Cluster, k=numb_clusters_used)) # cut tree into 3 clusters
+cluster_ids_hclust=unique(cluster_memberships_hclust)
+
+ProjectData_with_hclust_membership <- cbind(1:length(cluster_memberships_hclust),cluster_memberships_hclust)
+colnames(ProjectData_with_hclust_membership)<-c("Observation Number","Cluster_Membership")
+```
+
+
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
+show_data = data.frame(round(ProjectData_with_hclust_membership,2))
+show_data = show_data[1:min(max_data_report,nrow(show_data)),]
+m1<-gvisTable(show_data, options=list(showRowNumber=FALSE, width=350, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
+print(m1,'chart')
+```
+</div>
+</div>
+<br>
+
+**Kmean Clustering**
+
+Here are the clusters our observations belong to when we select `r numb_clusters_used` clusters and the `r kmeans_method` kmeans method, for the first `r min(max_data_report,nrow(ProjectData))` people:
+
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
+kmeans_clusters <- kmeans(ProjectData_segment,centers= numb_clusters_used, iter.max=1000, algorithm=kmeans_method)
+
+ProjectData_with_kmeans_membership <- cbind(1:length(kmeans_clusters$cluster),kmeans_clusters$cluster)
+colnames(ProjectData_with_kmeans_membership)<-c("Observation Number","Cluster_Membership")
+
+## getting the cluster ids into Project Data
+
+ProjectData <- cbind(ProjectData, kmeans_clusters$cluster)
+colnames(ProjectData)[ncol(ProjectData)] <- "Cluster_Membership"
+cluster_membership_test <- rep(0, nrow(ProjectData))
+ProjectData <- cbind(ProjectData, cluster_membership_test)
+colnames(ProjectData)[ncol(ProjectData)] <- "Cluster_test"
+
+ProjectData[ProjectData[, 45] == Cluster_to_test , 46] <- 1
+
+Probability_Threshold = Probability_Threshold/100 # make it between 0 and 1
+dependent_variable = unique(sapply(dependent_variable,function(i) min(ncol(ProjectData), max(i,1))))
+independent_variables = unique(sapply(independent_variables,function(i) min(ncol(ProjectData), max(i,1))))
+
+if (length(unique(ProjectData[,dependent_variable])) !=2){
+  cat("\n*****\n BE CAREFUL, THE DEPENDENT VARIABLE TAKES MORE THAN 2 VALUES...")
+  cat("\nSplitting it around its median...\n*****\n ")
+  new_dependent = ProjectData[,dependent_variable] >= median(ProjectData[,dependent_variable])
+  ProjectData[,dependent_variable] <- 1*new_dependent
+}
+
+```
+
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
+show_data = data.frame(round(ProjectData_with_kmeans_membership,2))
+show_data = show_data[1:min(max_data_report,nrow(show_data)),]
+m1<-gvisTable(show_data, options=list(showRowNumber=FALSE,width=350, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
+print(m1,'chart')
+```
+</div>
+</div>
+<br>
+
+#### Step 7. Profile and interpret the clusters 
+
+We decided we use the `r numb_clusters_used` segments found using Kmeans as outlined above as it is more statistically accurate than hierarchical clustering. For profilling, we decided to use `r if(length(total_arributes)==length(profile_attributes_used)){"all"}else{paste(length(profile_attributes_used), " out of total ", length(total_arributes), sep="")}` original variables. Although some variables were used in factor analysis, remember that we used factor scores (not original scores) for cluster analysis. We can see how the responses to our survey differ across segments. The average values of our data for the total population as well as within each customer segment are:
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
+cluster_memberships_kmeans <- kmeans_clusters$cluster 
+cluster_ids_kmeans <- unique(cluster_memberships_kmeans)
+```
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
+cluster_memberships <- cluster_memberships_hclust
+cluster_ids <-  cluster_ids_hclust  
+if (profile_with == "hclust"){
+  cluster_memberships <- cluster_memberships_hclust
+  cluster_ids <-  cluster_ids_hclust  
+  }
+if (profile_with == "kmeans"){
+  cluster_memberships <- cluster_memberships_kmeans
+  cluster_ids <-  cluster_ids_kmeans
+  }
+
+# SAVE THE DATA in the cluster file
+NewData = matrix(cluster_memberships,ncol=1)
+write.csv(NewData,file="cluster_file.csv")
+
+population_average = matrix(apply(ProjectData_profile, 2, mean), ncol=1)
+colnames(population_average) <- "Population"
+Cluster_Profile_mean <- sapply(sort(cluster_ids), function(i) apply(ProjectData_profile[(cluster_memberships==i), ], 2, mean))
+if (ncol(ProjectData_profile) <2)
+  Cluster_Profile_mean=t(Cluster_Profile_mean)
+colnames(Cluster_Profile_mean) <- paste("Segment", 1:length(cluster_ids), sep=" ")
+cluster.profile <- cbind (population_average,Cluster_Profile_mean)
+```
+
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, results='asis'}
+show_data = data.frame(round(cluster.profile,2))
+#show_data = show_data[1:min(max_data_report,nrow(show_data)),]
+row<-rownames(show_data)
+dfnew<-cbind(row,show_data)
+change<-colnames(dfnew)
+change[1]<-"Variables"
+colnames (dfnew)<-change
+m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
+print(m1,'chart')
+
+```
+</div>
+</div>
+
+We can also "visualize" the segments using **snake plots** for each cluster. For example, we can plot the means of the profiling variables for each of our clusters to better visualize differences between segments. For better visualization, we plot the standardized profiling variables.
+
+```{r fig.width=6, fig.height=6, message=FALSE, echo=FALSE, fig.align='center', warning=FALSE, fig=TRUE}
+ProjectData_scaled <- apply(ProjectData,2, function(r) {if (sd(r)!=0) res=(r-mean(r))/sd(r) else res=0*r; res})
+ProjectData_scaled_profile = ProjectData_scaled[, profile_attributes_used,drop=F]
+
+Cluster_Profile_standar_mean <- sapply(sort(cluster_ids), function(i) apply(ProjectData_scaled_profile[(cluster_memberships==i), ,drop = F], 2, mean))
+if (ncol(ProjectData_scaled_profile) < 2)
+  Cluster_Profile_standar_mean = t(Cluster_Profile_standar_mean)
+colnames(Cluster_Profile_standar_mean) <- paste("Segment", 1:length(cluster_ids), sep=" ")
+
+## choose the colors for snake plots
+custColors <- rainbow(12)[c(1, 2, 5, 9, 11, 12)]
+
+plot(Cluster_Profile_standar_mean[, 1,drop=F], type="l", col=custColors[1], main="Snake plot for each cluster", ylab="mean of cluster", xlab="Profiling variables (standardized)",ylim=c(min(Cluster_Profile_standar_mean),max(Cluster_Profile_standar_mean))) 
+for(i in 2:ncol(Cluster_Profile_standar_mean))
+  lines(Cluster_Profile_standar_mean[, i], col=custColors[i])
+```
+
+We can also compare the averages of the profiling variables of each segment relative to the average of the variables across the whole population. This can also help us better understand whether  there are indeed clusters in our data (e.g. if all segments are much like the overall population, there may be no segments). For example, we can measure the ratios of the average for each cluster to the average of the population (e.g. average of cluster/average of population) and explore a table as following:
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, results='asis'}
+population_average_matrix <- population_average[,"Population",drop=F] %*% matrix(rep(1,ncol(Cluster_Profile_mean)),nrow=1)
+cluster_profile_ratios <- (ifelse(population_average_matrix==0, 0,Cluster_Profile_mean/population_average_matrix))
+colnames(cluster_profile_ratios) <- paste("Segment", 1:ncol(cluster_profile_ratios), sep=" ")
+rownames(cluster_profile_ratios) <- colnames(ProjectData)[profile_attributes_used]
+
+## printing the result in a clean-slate table
+cat(renderHeatmapX(cluster_profile_ratios, border=1, center = 1, minvalue = heatmin))
+```
+
+From above table and snake plot, we can easily see that segments appear distinct with one high, one medium, and one low impact segment per specific needs. Based on this cluster analysis, we can define customer segments as :
+
+1. Matured clients
+2. Entry level clients
+3. Support oriented and cash rich clients
+
+Using the table above, we can describe the specific and differentiated needs of segments as following :
+
+**1. Matured clients**
+
+These customers are mature businesses and there are total `r nrow(ProjectData[ProjectData[,"Cluster_Membership"]==1,])` clients (`r round(100*nrow(ProjectData[ProjectData[,"Cluster_Membership"]==1,])/nrow(ProjectData), 2)`% of whole dataset). They needs their supplier to have an efficient and reliable ordering process (`r round(100*(cluster_profile_ratios["MAXDIFF: Efficient and reliable ordering process",1]-1),2)`% higher than population average), delivery & inventory management (`r round(100*(cluster_profile_ratios["MAXDIFF: Delivery &amp; inventory management",1]-1),2)`% higher than population average), and formula based or fixed material price (`r round(100*(cluster_profile_ratios["MAXDIFF: Formula based or fixed material price",1]-1),2)`% higher than population average). This shows that they are more mature and process based clients and they want certainty and predictability in their cost. This is strengthened more by having `r round(100*(cluster_profile_ratios["MAXDIFF: Credit limit. financing and payment terms",1]-1),2)` percent higher than population average in needs of credit limit, financing and payment terms and the highest among 3 segments.
+
+Since they are already matured, clients from this segment do not care and need so much of collaboration for growth (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Collaboration for growth",1]),2)`% lower than population average), global service and operations (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Global service and operations",1]),2)`% lower than population average), business services (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Business services",1]),2)`% lower than population average). They seem to know of what they want as they do not need their supplier to have broad material portfolio (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Broad material portfolio",1]),2)`% lower than population average).
+
+**2. Entry level clients**
+
+These customers are entry level business and they are total `r nrow(ProjectData[ProjectData[,"Cluster_Membership"]==2,])` clients (`r round(100*nrow(ProjectData[ProjectData[,"Cluster_Membership"]==2,])/nrow(ProjectData), 2)`% of whole dataset). Since they are entry level businesses, they are willing to collaborate for growth (`r round(100*(cluster_profile_ratios["MAXDIFF: Collaboration for growth",2]-1),2)`% higher than population average) and they needs their supplier support towards their sustainabile goals (`r round(100*(cluster_profile_ratios["MAXDIFF: Support towards your sustainability goals",2]-1),2)`% higher than population average). Being an entry level businesses, they also want dedicated account manager relationship (`r round(100*(cluster_profile_ratios["MAXDIFF: Account manager relationship",2]-1),2)`% higher than population average) and they need their supplier to have a strong business services (`r round(100*(cluster_profile_ratios["MAXDIFF: Business services",2]-1),2)`% higher than population average) and global service and operations (`r round(100*(cluster_profile_ratios["MAXDIFF: Global service and operations",2]-1),2)`% higher than population average). 
+
+Strangely, they are not very much interested in material coloring solutions (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Material coloring solutions",2]),2)`% lower than population average) and broad material portfolio (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Broad material portfolio",2]),2)`% lower than population average). This may be because they are entry level businesses and they still do not need sophisticated and advanced services.
+
+Most importantly, they paid premium in the past (`r round(100*(cluster_profile_ratios["Paid premium in past",2]-1),2)`% higher than population average) and therefore, they are valuable customers. However, they have highest average score in "willing to change supplier" with `r round(cluster_profile_ratios["Willing to Changing suppliers",2],2)` among all segments. So, we need to pay more attention to this segments as this segment has a lot of room to improve and can grow the business and our subsequent analysis will be based on this segment.
+
+**3. Support oriented and cash rich clients**
+
+These customers are support oriented and cash rich clients and they are total `r nrow(ProjectData[ProjectData[,"Cluster_Membership"]==3,])` clients (`r round(100*nrow(ProjectData[ProjectData[,"Cluster_Membership"]==3,])/nrow(ProjectData), 2)`% of whole dataset). They rate highly generally on support related questions such as material selection support (`r round(100*(cluster_profile_ratios["MAXDIFF: Material selection support",3]-1),2)`% higher than population average), processing support (`r round(100*(cluster_profile_ratios["MAXDIFF: Processing support",3]-1),2)`% higher than population average), and application development support (`r round(100*(cluster_profile_ratios["MAXDIFF: Application development support",3]-1),2)`% higher than population average). Interestingly, they need supplier with significantly broad material portfolio (`r round(100*(cluster_profile_ratios["MAXDIFF: Broad material portfolio",3]-1),2)`% higher than population average) and material coloring solutions (`r round(100*(cluster_profile_ratios["MAXDIFF: Material coloring solutions",3]-1),2)`% higher than population average). May be because their need of products are diversed and therefore, they rate less for fixed material price (check below). As support oriented clients, they are more interested to collaborate during innovation process (`r round(100*(cluster_profile_ratios["MAXDIFF: Collaboration during your innovation process",3]-1),2)`% higher than population average) than collaboration for growth (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Collaboration for growth",3]),2)`% lower than population average). 
+
+They definitely are cash rish clients. They rate generally lower than population average for cost related needs such as total system cost reduction (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Total system cost reduction",3]),2)`% lower than population average) and formula based or fixed material price (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Formula based or fixed material price",3]),2)`% lower than population average). They do not need credit limit, financing and payment terms (`r round(100*(1-cluster_profile_ratios["MAXDIFF: Credit limit. financing and payment terms",3]),2)`% lower than population average). This segment of clients paid premium the most among all the segments (`r round(100*(cluster_profile_ratios["Paid premium in past",3]-1),2)`% higher than population average) and least willing to change supplier (`r round(100*(1-cluster_profile_ratios["Willing to Changing suppliers",3]),2)`% lower than population average).
+
+#### Step 8. Assess the robustness of our clusters
+
+We will skip this step for this exercise. However in practice this is a very important step. 
+
+
+### Classification
+
+After analyzing the survey data (using factor and cluster analysis), we decided to only focus on the second segment : **"Entry level clients"** which they thought were the most important ones. They decided to perform the classification and drivers analysis using only the responses to the behavioral questions to develop a modal for placing specific customer or client in the selected segment as following :
+
+1. "Willing to Changing suppliers"                            
+2. "Willing to Give more business"                            
+3. "Willing to Recommend to others"                           
+4. "Willing to Specify as supplier of choice"                 
+5. "Willing to Pay for consulting services"                   
+6. "Willing to Pay price premium"                             
+7. "Changed material suppliers in past"                       
+8. "Given more business in past"                              
+9. "Recommended to others in past"                            
+10. "Specify as supplier of choice in past"                    
+11. "Paid for consulting services in past"                     
+12. "Paid premium in past"                                     
+13. "Will - Order large quantity for lower price"              
+14. "Will accept - No sales rep for lower price"               
+15. "Will accept - Cancellation fees for lower price"          
+16. "Will accept - Longer lead times for lower price"          
+17. "Will accept - Broader materials specs for lower price"    
+18. "Will - Use own transportation for lower price"            
+19. "Will - Allocate more spending to supplier for lower price"
+20. "Will - Give up support for lower price"      
+
+#### Classification in 6 steps
+
+We will follow the 6 steps as below for classification.
+
+1. Create an estimation sample and two validation samples by splitting the data into three groups. Steps 2-5 below will then be performed only on the estimation and the first validation data. You should only do step 6 once on the second validation data, also called **test data**, and report/use the performance on that (second validation) data only to make final business decisions. 
+
+2.  Set up the dependent variable (as a categorical 0-1 variable; multi-class classification is also feasible, and similar, but we do not explore it in this note). 
+
+3. Make a preliminary assessment of the relative importance of the explanatory variables using visualization tools and simple descriptive statistics. 
+
+4.  Estimate the classification model using the estimation data, and interpret the results.
+
+5. Assess the accuracy of classification in the first validation sample, possibly repeating steps 2-5 a few times in different ways to increase performance.
+
+6. Finally, assess the accuracy of classification in the second validation sample.  You should eventually use/report all relevant performance measures/plots on this second validation sample only.
+
+#### Step 1: Splitting the data into estimation and validation samples
+
+Since we are using variables with different scales for independent variables, we normalized our data using as following:
+
+```{r, results='asis'}
+ProjectDatafactor_Example <- apply(ProjectData,2, function(r) {if (sd(r)!=0) res=(r-mean(r))/sd(r) else res=0*r; res})
+```
+
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='hide'}
+## use normalized scores for classifications
+ProjectData_S <- apply(ProjectData,2, function(r) {if (sd(r)!=0) res=(r-mean(r))/sd(r) else res=0*r; res})
+## retain the company number, sys respum, cluster membership and cluster test
+ProjectData <- cbind(ProjectData[, 1:2], ProjectData_S[, -c(1,2,45,46)], ProjectData[, 45:46])
+
+if (random_sampling){
+  estimation_data_ids=sample.int(nrow(ProjectData),floor(estimation_data_percent*nrow(ProjectData)/100))
+  non_estimation_data = setdiff(1:nrow(ProjectData),estimation_data_ids)
+  validation_data_ids=non_estimation_data[sample.int(length(non_estimation_data), floor(validation_data_percent/(validation_data_percent+test_data_percent)*length(non_estimation_data)))]
+  } else {
+    estimation_data_ids=1:floor(estimation_data_percent*nrow(ProjectData)/100)
+    non_estimation_data = setdiff(1:nrow(ProjectData),estimation_data_ids)
+    validation_data_ids = (tail(estimation_data_ids,1)+1):(tail(estimation_data_ids,1) + floor(validation_data_percent/(validation_data_percent+test_data_percent)*length(non_estimation_data)))
+    }
+
+test_data_ids = setdiff(1:nrow(ProjectData), union(estimation_data_ids,validation_data_ids))
+
+estimation_data=ProjectData[estimation_data_ids,]
+validation_data=ProjectData[validation_data_ids,]
+test_data=ProjectData[test_data_ids,]
+```
+
+We will use `r estimation_data_percent`% of the dataset as estimation data (`r nrow(estimation_data)` observations), `r validation_data_percent`% of the dataset as validation data (`r nrow(validation_data)` observations), and `r test_data_percent`% as test data (`r nrow(test_data)` observations). 
+
+<br>
+
+#### Step 2: Setting up the dependent variable
+
+We have merged the original dataset with cluster memerships from kmeans clustering. After that, we added one more variable at the end with the name **cluster test** which will have 1 for cluster number we want to use for classification and 0 for other clusters. Following is the first  `r max_data_report` rows of estimation data. Please go to the right end of the table to see the cluster membership and cluster test variable example.
+
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
+show_data = data.frame(round(estimation_data,2))
+show_data = show_data[1:min(max_data_report,nrow(show_data)),]
+row<-rownames(show_data)
+dfnew<-cbind(row,show_data)
+change<-colnames(dfnew)
+change[1]<-"No."
+colnames (dfnew)<-change
+m1<-gvisTable(dfnew, options=list(showRowNumber=F,width=1220, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
+print(m1,'chart')
+```
+</div>
+</div>
+
+
+In our data, the number of 0/1's in our estimation sample is as follows:
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
+class_percentages=matrix(c(sum(estimation_data[,dependent_variable]==1),sum(estimation_data[,dependent_variable]==0)), nrow=1)
+colnames(class_percentages)<-c(paste("Class 1 (Cluster ", Cluster_to_test, ")", sep=""), "Class 0 (Other clusters)")
+rownames(class_percentages)<-"# of Observations"
+print(xtable(class_percentages ,caption="Number of Observations per class in the Estimation Sample", digits=1,),type="html",html.table.attributes = "class='table table-striped table-hover table-bordered'",caption.placement="top",comment = FALSE,include.rownames = TRUE)
+```
+
+</div>
+</div>
+while in the validation sample they are:
+
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
+class_percentages=matrix(c(sum(validation_data[,dependent_variable]==1),sum(validation_data[,dependent_variable]==0)), nrow=1)
+colnames(class_percentages)<-c(paste("Class 1 (Cluster ", Cluster_to_test, ")", sep=""), "Class 0 (Other clusters)")
+rownames(class_percentages)<-"# of Observations"
+print(xtable(class_percentages ,caption="Number of Observations per class in the Validation Sample", digits=1,),type="html",html.table.attributes = "class='table table-striped table-hover table-bordered'",caption.placement="top",comment = FALSE,include.rownames = TRUE)
+```
+</div>
+</div>
+
+
+#### Step 3: Make a preliminary assessment of the relative importance of the explanatory variables using visualization tools and simple descriptive statistics.
+
+This table is for Actual 1
+
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}  
+show_data = data.frame(round(my_summary(estimation_data[estimation_data[,dependent_variable]==1,]),2))
+#show_data = show_data[1:min(max_data_report,nrow(show_data)),]
+row<-rownames(show_data)
+dfnew<-cbind(row,show_data)
+change<-colnames(dfnew)
+change[1]<-"VariablesB"
+colnames (dfnew)<-change
+m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=400,allowHTML=TRUE,page='disable'))
+print(m1,'chart')
+```
+</div>
+</div>
+
+This table is for Actual 0
+
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}  
+show_data = data.frame(round(my_summary(estimation_data[estimation_data[,dependent_variable]==0,]),2))
+#show_data = show_data[1:min(max_data_report,nrow(show_data)),]
+row<-rownames(show_data)
+dfnew<-cbind(row,show_data)
+change<-colnames(dfnew)
+change[1]<-"VariablesA"
+colnames (dfnew)<-change
+m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=400,allowHTML=TRUE,page='disable'))
+print(m1,'chart')
+```
+</div>
+</div>
+
+
+First one is for Actual 1 and second one is for Actual 0.
+
+<center style="width=1048px;">
+```{r echo=FALSE, message=FALSE, warning=FALSE,prompt=FALSE, results='asis',fig.height=10,fig.width=16}
+par(mfrow=c(2,1))
+DVvalues = unique(estimation_data[,dependent_variable])
+x0 = estimation_data[which(estimation_data[,dependent_variable]==DVvalues[1]),independent_variables]
+x1 = estimation_data[which(estimation_data[,dependent_variable]==DVvalues[2]),independent_variables]
+colnames(x0) <- 1:ncol(x0)
+colnames(x1) <- 1:ncol(x1)
+boxplot(x0)
+boxplot(x1)
+```
+</center>
+
+Can you see which variables appear to be the most discrimatory ones?
+Your text
+
+
+#### Step 4: Estimate the classification model using the estimation data, and interpret the results.
+
+Your text
+
+
+```{r echo=FALSE, message=FALSE,warning=FALSE, prompt=FALSE, results='asis'}
+
+# just name the variables numerically so that they look ok on the tree plots
+independent_variables_nolabel = paste("IV", 1:length(independent_variables), sep="")
+
+estimation_data_nolabel = cbind(estimation_data[,dependent_variable], estimation_data[,independent_variables])
+colnames(estimation_data_nolabel)<- c(colnames(estimation_data)[dependent_variable],independent_variables_nolabel)
+
+validation_data_nolabel = cbind(validation_data[,dependent_variable], validation_data[,independent_variables])
+colnames(validation_data_nolabel)<- c(dependent_variable,independent_variables_nolabel)
+
+test_data_nolabel = cbind(test_data[,dependent_variable], test_data[,independent_variables])
+colnames(test_data_nolabel)<- c(dependent_variable,independent_variables_nolabel)
+
+estimation_data_nolabel = data.frame(estimation_data_nolabel)
+validation_data_nolabel = data.frame(validation_data_nolabel)
+test_data_nolabel = data.frame(test_data_nolabel)
+
+estimation_data = data.frame(estimation_data)
+validation_data = data.frame(validation_data)
+test_data = data.frame(test_data)
+
+```
+
+
+<center>
+```{r echo=FALSE, message=FALSE, warning=FALSE,prompt=FALSE, results='asis'}
+formula=paste(colnames(estimation_data)[dependent_variable],paste(Reduce(paste,sapply(head(independent_variables_nolabel,-1), function(i) paste(i,"+",sep=""))),tail(independent_variables_nolabel,1),sep=""),sep="~")
+CART_tree<-rpart(formula, data= estimation_data_nolabel,method="class", control=CART_control)
+
+fancyRpartPlot(CART_tree)
+```
+</center>
+
+
+<center style="width=900px; height=800px;">
+```{r echo=FALSE, message=FALSE,warning=FALSE, prompt=FALSE, results='asis',fig.width=14,fig.height=10}
+CART_tree_large<-rpart(formula, data= estimation_data_nolabel,method="class", control=rpart.control(cp = 0.005))
+
+fancyRpartPlot(CART_tree_large)
+```
+</center>
+
+In our case, the probability our validation data belong to class 1 (e.g. the customer is likely to purchase a boat) for the first few validation data observations, using the first CART above, is:
+
+```{r echo=FALSE, message=FALSE,warning=FALSE, results='asis'}
+# Let's first calculate all probabilites for the estimation, validation, and test data
+estimation_Probability_class1_tree<-predict(CART_tree, estimation_data_nolabel)[,2]
+estimation_Probability_class1_tree_large<-predict(CART_tree_large, estimation_data_nolabel)[,2]
+
+validation_Probability_class1_tree<-predict(CART_tree, validation_data_nolabel)[,2]
+validation_Probability_class1_tree_large<-predict(CART_tree_large, validation_data_nolabel)[,2]
+
+test_Probability_class1_tree<-predict(CART_tree, test_data_nolabel)[,2]
+test_Probability_class1_tree_large<-predict(CART_tree_large, test_data_nolabel)[,2]
+
+
+estimation_prediction_class_tree=1*as.vector(estimation_Probability_class1_tree > Probability_Threshold)
+estimation_prediction_class_tree_large=1*as.vector(estimation_Probability_class1_tree_large > Probability_Threshold)
+
+validation_prediction_class_tree=1*as.vector(validation_Probability_class1_tree > Probability_Threshold)
+validation_prediction_class_tree_large=1*as.vector(validation_Probability_class1_tree_large > Probability_Threshold)
+
+test_prediction_class_tree=1*as.vector(test_Probability_class1_tree > Probability_Threshold)
+test_prediction_class_tree_large=1*as.vector(test_Probability_class1_tree_large > Probability_Threshold)
+
+```
+<br>
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
+
+Classification_Table=rbind(validation_data[,dependent_variable],validation_Probability_class1_tree)
+rownames(Classification_Table)<-c("Actual Class","Probability of Class 1")
+colnames(Classification_Table)<- paste("Obs", 1:ncol(Classification_Table), sep=" ")
+
+Classification_Table_large=rbind(validation_data[,dependent_variable],validation_Probability_class1_tree)
+rownames(Classification_Table_large)<-c("Actual Class","Probability of Class 1")
+colnames(Classification_Table_large)<- paste("Obs", 1:ncol(Classification_Table_large), sep=" ")
+
+show_data = data.frame(round(Classification_Table,2))
+show_data = show_data[,1:min(max_data_report,ncol(show_data))]
+row<-rownames(show_data)
+dfnew<-cbind(row,show_data)
+change<-colnames(dfnew)
+change[1]<-"Classification Table"
+colnames (dfnew)<-change
+m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=140,allowHTML=TRUE,page='disable'))
+print(m1,'chart')
+
+```
+<br>
+
+In practice we need to select the **probability threshold** above which we consider an observation as "class 1": this is an important choice that we will discuss below. First we discuss another method widely used, namely logistic regression.
+
+<br>
+<br>
+
+**Logistic Regression** is a method similar to linear regression except that the dependent variable can be discrete (e.g. 0 or 1). **Linear** logistic regression estimates the coefficients of a linear model using the selected independent variables while optimizing a classification criterion. For example, this is the logistic regression parameters for our data:
+
+
+<br>
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
+
+formula_log=paste(colnames(estimation_data[,dependent_variable,drop=F]),paste(Reduce(paste,sapply(head(independent_variables,-1), function(i) paste(colnames(estimation_data)[i],"+",sep=""))),colnames(estimation_data)[tail(independent_variables,1)],sep=""),sep="~")
+
+logreg_solution <- glm(formula_log, family=binomial(link="logit"),  data=estimation_data)
+
+log_coefficients = round(summary(logreg_solution)$coefficients,1)
+print(xtable(log_coefficients,caption="Logistic Regression: Estimated Coefficients" , digits=1,),type="html",html.table.attributes = "class='table table-striped table-hover table-bordered'",caption.placement="top",comment = FALSE,include.rownames = TRUE)
+
+```
+
+In our case, the probability our validation data belong to class 1 (e.g. the customer is likely to purchase a boat) for the first few validation data observations, using the logistic regression above, is:
+
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
+# Let's get the probabilities for the 3 types of data again
+estimation_Probability_class1_log<-predict(logreg_solution, type="response", newdata=estimation_data[,independent_variables])
+validation_Probability_class1_log<-predict(logreg_solution, type="response", newdata=validation_data[,independent_variables])
+test_Probability_class1_log<-predict(logreg_solution, type="response", newdata=test_data[,independent_variables])
+
+estimation_prediction_class_log=1*as.vector(estimation_Probability_class1_log > Probability_Threshold)
+validation_prediction_class_log=1*as.vector(validation_Probability_class1_log > Probability_Threshold)
+test_prediction_class_log=1*as.vector(test_Probability_class1_log > Probability_Threshold)
+
+```
+
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
+
+Classification_Table=rbind(validation_data[,dependent_variable],validation_Probability_class1_log)
+rownames(Classification_Table)<-c("Actual Class","Probability of Class 1")
+colnames(Classification_Table)<- paste("Obs", 1:ncol(Classification_Table), sep=" ")
+
+show_data = data.frame(round(Classification_Table,2))
+show_data = show_data[,1:min(max_data_report,ncol(show_data))]
+row<-rownames(show_data)
+dfnew<-cbind(row,show_data)
+change<-colnames(dfnew)
+change[1]<-"Classification Table"
+colnames (dfnew)<-change
+m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=140,allowHTML=TRUE,page='disable'))
+print(m1,'chart')
+
+```
+<br>
+
+
+Your text
+
+From this table we can see the **key drivers** of the classification according to each of the methods we used here. 
+
+<br>
+<br>
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, results='asis'}
+log_importance = tail(log_coefficients[,"z value", drop=F],-1) # remove the intercept
+log_importance = log_importance/max(abs(log_importance))
+
+tree_importance = CART_tree$variable.importance
+tree_ordered_drivers = as.numeric(gsub("\\IV"," ",names(CART_tree$variable.importance)))
+tree_importance_final = rep(0,length(independent_variables))
+tree_importance_final[tree_ordered_drivers] <- tree_importance
+tree_importance_final <- tree_importance_final/max(abs(tree_importance_final))
+tree_importance_final <- tree_importance_final*sign(log_importance)
+
+large_tree_importance = CART_tree_large$variable.importance
+large_tree_ordered_drivers = as.numeric(gsub("\\IV"," ",names(CART_tree_large$variable.importance)))
+large_tree_importance_final = rep(0,length(independent_variables))
+large_tree_importance_final[large_tree_ordered_drivers] <- large_tree_importance
+large_tree_importance_final <- large_tree_importance_final/max(abs(large_tree_importance_final))
+large_tree_importance_final <- large_tree_importance_final*sign(log_importance)
+
+Importance_table <- cbind(tree_importance_final,large_tree_importance_final, log_importance)
+colnames(Importance_table) <- c("CART 1", "CART 2", "Logistic Regr.")
+rownames(Importance_table) <- rownames(log_importance)
+## printing the result in a clean-slate table
+cat(renderHeatmapX(Importance_table, border=1, center = 0, minvalue = 0))
+```
+
+<br>
+<br>
+
+#### Step 5: Assess the accuracy of classification in the first validation sample
+
+Your text
+
+### 1.  **Hit ratio** 
+
+These are as follows for the probability threshold  `r Probability_Threshold*100`% for the validation data:
+
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, message=FALSE,warning=FALSE,comment=NA,prompt=FALSE, results='asis'}
+validation_actual=validation_data[,dependent_variable]
+validation_predictions = rbind(validation_prediction_class_tree,
+                               validation_prediction_class_tree_large,
+                               validation_prediction_class_log)
+validation_hit_rates = rbind(
+  100*sum(validation_prediction_class_tree==validation_actual)/length(validation_actual), 
+  100*sum(validation_prediction_class_tree_large==validation_actual)/length(validation_actual), 
+  100*sum(validation_prediction_class_log==validation_actual)/length(validation_actual)
+  )
+colnames(validation_hit_rates) <- "Hit Ratio"
+rownames(validation_hit_rates) <- c("First CART", "Second CART", "Logistic Regression")
+
+print(xtable(validation_hit_rates ,caption="Validation Data Hit Ratios for different classifiers tested", digits=1,),type="html",html.table.attributes = "class='table table-striped table-hover table-bordered'",caption.placement="top",comment = FALSE,include.rownames = TRUE)
+
+```
+</div>
+</div>
+
+
+while for the estimation data the hit rates are:
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
+estimation_actual=estimation_data[,dependent_variable]
+estimation_predictions = rbind(estimation_prediction_class_tree,
+                               estimation_prediction_class_tree_large,
+                               estimation_prediction_class_log)
+estimation_hit_rates = rbind(
+  100*sum(estimation_prediction_class_tree==estimation_actual)/length(estimation_actual), 
+  100*sum(estimation_prediction_class_tree_large==estimation_actual)/length(estimation_actual), 
+  100*sum(estimation_prediction_class_log==estimation_actual)/length(estimation_actual)
+  )
+colnames(estimation_hit_rates) <- "Hit Ratio"
+rownames(estimation_hit_rates) <- c("First CART", "Second CART", "Logistic Regression")
+
+print(xtable(estimation_hit_rates ,caption="Estimation Data Hit Ratios for different classifiers tested", digits=1,),type="html",html.table.attributes = "class='table table-striped table-hover table-bordered'",caption.placement="top",comment = FALSE,include.rownames = TRUE)
+
+```
+</div>
+</div>
+
+**Why are the performances on the estimation and validation data different? How different can they possibly be? What does this diffference depend on?** Is the Validation Data Hit Rate satisfactory? Which classifier should we use? What should be the benchmark against which to compare the hit rate? 
+
+YOUR TEXT/INTERPRETATION
+
+### 2. **Confusion matrix**
+
+YOUR TEXT/INTERPRETATION
+
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
+validation_prediction_best = validation_predictions[which.max(validation_hit_rates),]
+conf_matrix = matrix(rep(0,4),ncol=2)
+conf_matrix[1,1]<- 100*sum(validation_prediction_best*validation_data[,dependent_variable])/sum(validation_data[,dependent_variable])
+conf_matrix[1,2]<- 100*sum((!validation_prediction_best)*validation_data[,dependent_variable])/sum(validation_data[,dependent_variable])
+conf_matrix[2,2]<- 100*sum((!validation_prediction_best)*(!validation_data[,dependent_variable]))/sum((!validation_data[,dependent_variable]))
+conf_matrix[2,1]<- 100*sum((validation_prediction_best)*(!validation_data[,dependent_variable]))/sum((!validation_data[,dependent_variable]))
+conf_matrix = round(conf_matrix,2)
+
+colnames(conf_matrix) <- c("Predicted 1", "Predicted 0")
+rownames(conf_matrix) <- c("Actual 1", "Actual 0")
+
+print(xtable(conf_matrix ,caption="Confusion Matrix for Validation data", digits=1,),type="html",html.table.attributes = "class='table table-striped table-hover table-bordered'",caption.placement="top",comment = FALSE)
+```
+
+</div>
+</div>
+<br>
+
+Note that the percentages add up to 100% for each row: can you see why? Moreover, a "good" confusion matrix should have large diagonal values and small off-diagonal oens: you see why?
+
+YOUR TEXT/INTERPRETATION
+
+### 3.  **ROC curve** 
+
+
+The ROC curves for the validation data for both the CARTs above as well as the logistic regression are as follows:
+
+```{r echo=FALSE,results='hide',include=FALSE,warning=FALSE,error=FALSE}
+
+validation_actual_class <- as.numeric(validation_data[,dependent_variable])
+
+pred_tree <- prediction(validation_Probability_class1_tree, validation_actual_class)
+pred_tree_large <- prediction(validation_Probability_class1_tree_large, validation_actual_class)
+pred_log <- prediction(validation_Probability_class1_log, validation_actual_class)
+
+```
+
+<style>
+.wrapper{
+
+
+width: 100%;
+
+overflow-x: scroll;
+
+}
+.wrapper1{
+
+height:450px;
+overflow-y: scroll;
+}
+</style>
+<div class="wrapper wrapper1">
+```{r echo=FALSE, warning=FALSE,comment=NA, results='asis',error=FALSE,message=FALSE}
+test<-performance(pred_tree, "tpr", "fpr")
+df<- cbind(as.data.frame(test@x.values),as.data.frame(test@y.values))
+colnames(df) <- c("False Positive rate CART 1", "True Positive CART 1")
+Line    <- gvisLineChart(as.data.frame(df), xvar="False Positive rate CART 1", yvar="True Positive CART 1", options=list(title='ROC Curve for CART 1', legend="right",  width=600, height=400, hAxis="{title:'False Positive rate CART 1', titleTextStyle:{color:'black'}}", vAxes="[{title:'True Positive CART 1'}]",  series="[{color:'green',pointSize:3, targetAxisIndex: 0}]"))
+
+############################
+test1<-performance(pred_log, "tpr", "fpr")
+df1<- cbind(as.data.frame(test1@x.values),as.data.frame(test1@y.values))
+colnames(df1) <- c("False Positive rate log reg", "True Positive log reg")
+Line1    <- gvisLineChart(as.data.frame(df1), xvar="False Positive rate log reg", yvar="True Positive log reg", options=list(title='ROC Curve for logistic regression', legend="right", width=600, height=400, hAxis="{title:'False Positive rate log reg', titleTextStyle:{color:'black'}}", vAxes="[{title:'True Positive log reg'}]",  series="[{color:'blue',pointSize:3, targetAxisIndex: 0}]"))
+
+###############################
+test2<-performance(pred_tree_large, "tpr", "fpr")
+df2<- cbind(as.data.frame(test2@x.values),as.data.frame(test2@y.values))
+colnames(df2) <- c("False Positive rate CART 2", "True Positive CART 2")
+Line2    <- gvisLineChart(as.data.frame(df2), xvar="False Positive rate CART 2", yvar="True Positive CART 2", options=list(title='ROC Curve for CART 2', legend="right", width=600, height=400, hAxis="{title:'False Positive rate CART 2', titleTextStyle:{color:'black'}}", vAxes="[{title:'True Positive CART 2'}]",  series="[{color:'red',pointSize:3, targetAxisIndex: 0}]"))
+
+###############################
+print(Line, 'chart')
+print(Line2, 'chart')
+print(Line1, 'chart')
+```
+</div>
+</br>
+
+<br>
+<br>
+which, if we plot all in the same graph for comparison, are (black: CART 1; red: CART 2; blue: logistic regression): 
+<br>
+
+```{r echo=FALSE}
+plot(performance(pred_tree, "tpr", "fpr"),  lty=1, add=FALSE, main="ROC Curve")
+grid()
+par(new=TRUE)
+plot(performance(pred_tree_large, "tpr", "fpr"), col="red", lty=1, add=FALSE)
+par(new=TRUE)
+plot(performance(pred_log, "tpr", "fpr"), col="blue", lty=1, add=FALSE)
+par(new=FALSE)
+
+```
+<br>
+How should a good ROC curve look like? A rule of thumb in assessing ROC curves is that the "higher" the curve, hence the larger the area under the curve, the better. You may also select one point on the ROC curve (the "best one" for our purpose) and use that false positive/false negative performances (and corresponding threshold for P(0)) to assess your model. **Which point on the ROC should we select?**
+
+YOUR TEXT/INTERPRETATION
+
+
+### 4. **Lift curve**
+
+
+The Lift curves for the validation data for our three classifiers are the following:
+
+<style>
+.wrapper{
+
+
+width: 100%;
+
+overflow-x: scroll;
+
+}
+.wrapper1{
+
+height:450px;
+overflow-y: scroll;
+}
+</style>
+<div class="wrapper wrapper1">
+```{r lift,echo=FALSE,results='asis',warning=FALSE,error=FALSE}
+validation_actual<- validation_data[,dependent_variable]
+all1s=sum(validation_actual); 
+
+probs = validation_Probability_class1_tree
+xaxis = sort(unique(c(0,1,probs)), decreasing = TRUE)
+res = 100*Reduce(cbind,lapply(xaxis, function(prob){
+  useonly = which(probs >= 1-prob)
+  c(length(useonly)/length(validation_actual), sum(validation_actual[useonly])/all1s) 
+  }))
+xaxis = res[1,]; yaxis = res[2,]
+names(xaxis)<- NULL; names(yaxis) <- NULL
+frame<-cbind(xaxis,yaxis)
+frame<-as.data.frame(frame)
+LineFrame   <- gvisLineChart(frame, xvar=c("xaxis"), yvar="yaxis", options=list(title='Lift Curve for validation data CART 1', legend="right", width=600, height=400, hAxis="{title:'Percent of data', titleTextStyle:{color:'black'}}", vAxes="[{title:'Percent of Class 1'}]",  series="[{color:'green',pointSize:3, targetAxisIndex: 0}]"))
+print(LineFrame,'chart')
+
+
+probs = validation_Probability_class1_tree_large
+xaxis = sort(unique(c(0,1,probs)), decreasing = TRUE)
+res = 100*Reduce(cbind,lapply(xaxis, function(prob){
+  useonly = which(probs >= 1-prob)
+  c(length(useonly)/length(validation_actual), sum(validation_actual[useonly])/all1s) 
+  }))
+xaxis = res[1,]; yaxis = res[2,]
+names(xaxis)<- NULL; names(yaxis) <- NULL
+frame<-cbind(xaxis,yaxis)
+frame<-as.data.frame(frame)
+LineFrame1   <- gvisLineChart(frame, xvar=c("xaxis"), yvar="yaxis", options=list(title='Lift Curve for validation data CART 2', legend="right", width=600, height=400, hAxis="{title:'Percent of data', titleTextStyle:{color:'black'}}", vAxes="[{title:'Percent of Class 1'}]",  series="[{color:'green',pointSize:3, targetAxisIndex: 0}]"))
+print(LineFrame1,'chart')
+
+probs = validation_Probability_class1_log
+xaxis = sort(unique(c(0,1,probs)), decreasing = TRUE)
+res = 100*Reduce(cbind,lapply(xaxis, function(prob){
+  useonly = which(probs >= prob)
+  c(length(useonly)/length(validation_actual), sum(validation_actual[useonly])/all1s) 
+  }))
+xaxis = res[1,]; yaxis = res[2,]
+names(xaxis)<- NULL; names(yaxis) <- NULL
+frame<-cbind(xaxis,yaxis)
+frame<-as.data.frame(frame)
+LineFrame2  <- gvisLineChart(frame, xvar=c("xaxis"), yvar="yaxis", options=list(title='Lift Curve for validation data logistic regression', legend="right", width=600, height=400, hAxis="{title:'Percent of data', titleTextStyle:{color:'black'}}", vAxes="[{title:'Percent of Class 1'}]",  series="[{color:'green',pointSize:3, targetAxisIndex: 0}]"))
+print(LineFrame2,'chart')
+
+```
+</div>
+</br>
+
+How should a good Lift Curve look like? Notice that if we were to randomly examine transactions, **the "random prediction" lift curve would be a 45 degrees straight diagonal line** (why?)! So the further **above** this 45 degrees line our Lift curve is, the better the "lift". Moreover, much like for the ROC curve, one can select the probability threshold appropriately so that any point of the lift curve is selected. **Which point on the lift curve should we select in practice?** 
+
+
+YOUR TEXT/INTERPRETATION
+
+### 5. **Profit Curve** 
+Here is the profit curve for our example if we consider the following business profit and loss for the correctly classified as well as the misclassified customers: 
+
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
+
+print(xtable(Profit_Matrix ,caption="Assumed Profits and Costs", digits=1,),type="html",html.table.attributes = "class='table table-striped table-hover table-bordered'",caption.placement="top",comment = FALSE,include.rownames = TRUE)
+
+```
+</div>
+</div>
+
+
+Based on these profit and cost estimates, the profit curves for the validation data for the three classifiers are:
+
+<style>
+.wrapper{
+
+
+width: 100%;
+
+overflow-x: scroll;
+
+}
+.wrapper1{
+
+height:450px;
+overflow-y: scroll;
+}
+</style>
+<div class="wrapper wrapper1">
+```{r echo=FALSE,results='asis',warning=FALSE,error=FALSE}
+actual_class<- validation_data[,dependent_variable]
+
+probs = validation_Probability_class1_tree
+xaxis = sort(unique(c(0,1,probs)), decreasing = TRUE)
+res = Reduce(cbind,lapply(xaxis, function(prob){
+  useonly = which(probs >= prob)
+  predict_class = 1*(probs >= prob)
+  theprofit = Profit_Matrix[1,1]*sum(predict_class==1 & actual_class ==1)+
+    Profit_Matrix[1,2]*sum(predict_class==0 & actual_class ==1)+
+    Profit_Matrix[2,1]*sum(predict_class==1 & actual_class ==0)+
+    Profit_Matrix[2,2]*sum(predict_class==0 & actual_class ==0)
+  
+  c(100*length(useonly)/length(actual_class), theprofit) 
+  }))
+xaxis = res[1,]; yaxis = res[2,]
+names(xaxis)<- NULL; names(yaxis) <- NULL
+frame<-cbind(xaxis,yaxis)
+frame<-as.data.frame(frame)
+LineFramev1   <- gvisLineChart(frame, xvar=c("xaxis"), yvar="yaxis", options=list(title='Profit Curve for validation data CART 1', legend="right", width=600, height=600, hAxis="{title:'Percent Selected', titleTextStyle:{color:'black'}}", vAxes="[{title:'Estimated Profit'}]",  series="[{color:'green',pointSize:3, targetAxisIndex: 0}]"))
+print(LineFramev1,'chart')
+
+probs = validation_Probability_class1_tree_large
+xaxis = sort(unique(c(0,1,probs)), decreasing = TRUE)
+res = Reduce(cbind,lapply(xaxis, function(prob){
+  useonly = which(probs >= prob)
+  predict_class = 1*(probs >= prob)
+  theprofit = Profit_Matrix[1,1]*sum(predict_class==1 & actual_class ==1)+
+    Profit_Matrix[1,2]*sum(predict_class==0 & actual_class ==1)+
+    Profit_Matrix[2,1]*sum(predict_class==1 & actual_class ==0)+
+    Profit_Matrix[2,2]*sum(predict_class==0 & actual_class ==0)
+  
+  c(100*length(useonly)/length(actual_class), theprofit) 
+  }))
+xaxis = res[1,]; yaxis = res[2,]
+names(xaxis)<- NULL; names(yaxis) <- NULL
+frame<-cbind(xaxis,yaxis)
+frame<-as.data.frame(frame)
+LineFramev2   <- gvisLineChart(frame, xvar=c("xaxis"), yvar="yaxis", options=list(title='Profit Curve for validation data CART 2', legend="right", width=600, height=400, hAxis="{title:'Percent Selected', titleTextStyle:{color:'black'}}", vAxes="[{title:'Estimated Profit'}]",  series="[{color:'green',pointSize:3, targetAxisIndex: 0}]"))
+print(LineFramev2,'chart')
+
+probs = validation_Probability_class1_log
+xaxis = sort(unique(c(0,1,probs)), decreasing = TRUE)
+res = Reduce(cbind,lapply(xaxis, function(prob){
+  useonly = which(probs >= prob)
+  predict_class = 1*(probs >= prob)
+  theprofit = Profit_Matrix[1,1]*sum(predict_class==1 & actual_class ==1)+
+    Profit_Matrix[1,2]*sum(predict_class==0 & actual_class ==1)+
+    Profit_Matrix[2,1]*sum(predict_class==1 & actual_class ==0)+
+    Profit_Matrix[2,2]*sum(predict_class==0 & actual_class ==0)
+  
+  c(100*length(useonly)/length(actual_class), theprofit) 
+  }))
+xaxis = res[1,]; yaxis = res[2,]
+names(xaxis)<- NULL; names(yaxis) <- NULL
+frame<-cbind(xaxis,yaxis)
+frame<-as.data.frame(frame)
+LineFramev3   <- gvisLineChart(frame, xvar=c("xaxis"), yvar="yaxis", options=list(title='Profit Curve for validation data logistic regression', legend="right", width=600, height=400, hAxis="{title:'Percent Selected', titleTextStyle:{color:'black'}}", vAxes="[{title:'Estimated Profit'}]",  series="[{color:'green',pointSize:3, targetAxisIndex: 0}]"))
+print(LineFramev3,'chart')
+
+```
+</div>
+
+We can then select the threshold that corresponds to the maximum expected profit (or minimum loss, if necessary). 
+
+
+YOUR TEXT/INTERPRETATION
+
+
+#### Step 6: Finally, assess the accuracy of classification in the test data.
+
+
+Let's see in our case how the **Confusion Matrix, ROC Curve, Lift Curve, and Profit Curve** look like for our test data:
+
+
+**Will the performance in the test data be similar to the performance in the  validation data above? More important: should we expect the performance of our classification model to be close to that in our test data when we deploy the model in practice? Why or why not? What should we do if they are different?**
+
+YOUR TEXT/INTERPRETATION
+
+
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='hide'}
+######for train data#####
+test_actual=test_data[,dependent_variable]
+test_predictions = rbind(test_prediction_class_tree,
+                         test_prediction_class_tree_large,
+                         test_prediction_class_log)
+test_hit_rates = rbind(
+  100*sum(test_prediction_class_tree==test_actual)/length(test_actual), 
+  100*sum(test_prediction_class_tree_large==test_actual)/length(test_actual), 
+  100*sum(test_prediction_class_log==test_actual)/length(test_actual)
+  )
+colnames(test_hit_rates) <- "Hit Ratio"
+rownames(test_hit_rates) <- c("First CART", "Second CART", "Logistic Regression")
+
+print(xtable(test_hit_rates ,caption="Test Data Hit Ratios for different classifiers tested", digits=1,),type="html",html.table.attributes = "class='table table-striped table-hover table-bordered'",caption.placement="top",comment = FALSE,include.rownames = TRUE)
+
+```
+
+</div>
+</div>
+
+The Confusion Matrix for the model with the best validation data hit ratio above:
+
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
+test_prediction_best = test_predictions[which.max(validation_hit_rates),]
+conf_matrix = matrix(rep(0,4),ncol=2)
+conf_matrix[1,1]<- 100*sum(test_prediction_best*test_data[,dependent_variable])/sum(test_data[,dependent_variable])
+conf_matrix[1,2]<- 100*sum((!test_prediction_best)*test_data[,dependent_variable])/sum(test_data[,dependent_variable])
+conf_matrix[2,2]<- 100*sum((!test_prediction_best)*(!test_data[,dependent_variable]))/sum((!test_data[,dependent_variable]))
+conf_matrix[2,1]<- 100*sum((test_prediction_best)*(!test_data[,dependent_variable]))/sum((!test_data[,dependent_variable]))
+conf_matrix = round(conf_matrix,2)
+
+colnames(conf_matrix) <- c("Predicted 1", "Predicted 0")
+rownames(conf_matrix) <- c("Actual 1", "Actual 0")
+
+print(xtable(conf_matrix ,caption="Confusion Matrix for test data", digits=1,),type="html",html.table.attributes = "class='table table-striped table-hover table-bordered'",caption.placement="top",comment = FALSE)
+```
+</div>
+</div>
+<br>
+
+ROC curves for the test data
+
+
+```{r echo=FALSE,results='hide',include=FALSE,warning=FALSE,error=FALSE}
+
+test_actual_class <- as.numeric(test_data[,dependent_variable])
+
+pred_tree1 <- prediction(test_Probability_class1_tree, test_actual_class)
+pred_tree_large1 <- prediction(test_Probability_class1_tree_large, test_actual_class)
+pred_log1 <- prediction(test_Probability_class1_log, test_actual_class)
+```
+
+<style>
+.wrapper{
+
+
+width: 100%;
+
+overflow-x: scroll;
+
+}
+.wrapper1{
+
+height:450px;
+overflow-y: scroll;
+}
+</style>
+<div class="wrapper wrapper1">
+```{r echo=FALSE, warning=FALSE,comment=NA, results='asis',error=FALSE,message=FALSE}
+test<-performance(pred_tree, "tpr", "fpr")
+df<- cbind(as.data.frame(test@x.values),as.data.frame(test@y.values))
+colnames(df) <- c("False Positive rate CART 1", "True Positive CART 1")
+Line    <- gvisLineChart(as.data.frame(df), xvar=c("False Positive rate CART 1"), yvar="True Positive CART 1", options=list(title='ROC Curve for CART 1', legend="right", width=600, height=400, hAxis="{title:'False Positive rate CART 1', titleTextStyle:{color:'black'}}", vAxes="[{title:'True Positive CART'}]",  series="[{color:'green',pointSize:3, targetAxisIndex: 0}]"))
+
+############################
+test2<-performance(pred_tree_large, "tpr", "fpr")
+df2<- cbind(as.data.frame(test2@x.values),as.data.frame(test2@y.values))
+colnames(df2) <- c("False Positive rate CART 2", "True Positive CART 2")
+Line2    <- gvisLineChart(as.data.frame(df2), xvar=c("False Positive rate CART 2"), yvar="True Positive CART 2", options=list(title='ROC Curve for CART 2', legend="right", width=600, height=400, hAxis="{title:'False Positive rate CART 2', titleTextStyle:{color:'black'}}", vAxes="[{title:'True Positive CART 2'}]",  series="[{color:'red',pointSize:3, targetAxisIndex: 0}]"))
+
+###############################
+test1<-performance(pred_log, "tpr", "fpr")
+df1<- cbind(as.data.frame(test1@x.values),as.data.frame(test1@y.values))
+colnames(df1) <- c("False Positive rate log reg", "True Positive log reg")
+Line1    <- gvisLineChart(as.data.frame(df1), xvar=c("False Positive rate log reg"), yvar="True Positive log reg", options=list(title='ROC Curve for logistic regression', legend="right", width=600, height=400, hAxis="{title:'False Positive rate log reg', titleTextStyle:{color:'black'}}", vAxes="[{title:'True Positive CART'}]",  series="[{color:'blue',pointSize:3, targetAxisIndex: 0}]"))
+###############################
+print(Line, 'chart')
+print(Line2, 'chart')
+print(Line1, 'chart')
+```
+</div>
+
+<br>
+<br>
+which, if we plot all in the same graph for comparison, are (black: CART 1; red: CART 2; blue: logistic regression): 
+<br>
+```{r echo=FALSE}
+plot(performance(pred_tree_large, "tpr", "fpr"), col="red", lty=1, add=FALSE)
+grid()
+par(new=TRUE)
+plot(performance(pred_log, "tpr", "fpr"), col="blue", lty=1, add=FALSE)
+par(new=TRUE)
+plot(performance(pred_tree, "tpr", "fpr"),  lty=1, add=FALSE, main="ROC Curve")
+par(new=FALSE)
+
+```
+<br>
+
+Lift Curves for the test data:
+
+<style>
+.wrapper{
+
+
+width: 100%;
+
+overflow-x: scroll;
+
+}
+.wrapper1{
+
+height:450px;
+overflow-y: scroll;
+}
+</style>
+<div class="wrapper wrapper1">
+```{r liftTest,echo=FALSE,results='asis',warning=FALSE,error=FALSE}
+test_actual<- test_data[,dependent_variable]
+all1s = sum(test_actual)
+
+probs = test_Probability_class1_tree
+xaxis = sort(unique(c(0,1,probs)), decreasing = TRUE)
+res = 100*Reduce(cbind,lapply(xaxis, function(prob){
+  useonly = which(probs >= 1-prob)
+  c(length(useonly)/length(test_actual), sum(test_actual[useonly])/all1s) 
+  }))
+xaxis = res[1,]; yaxis = res[2,]
+names(xaxis)<- NULL; names(yaxis) <- NULL
+frame<-cbind(xaxis,yaxis)
+frame<-as.data.frame(frame)
+LineFrame   <- gvisLineChart(frame, xvar=c("xaxis"), yvar="yaxis", options=list(title='Lift Curve for test data CART', legend="right", width=600, height=400, hAxis="{title:'Percent of data', titleTextStyle:{color:'black'}}", vAxes="[{title:' Percent of Class 1'}]",  series="[{color:'green',pointSize:3, targetAxisIndex: 0}]"))
+print(LineFrame,'chart')
+
+probs = test_Probability_class1_tree_large
+xaxis = sort(unique(c(0,1,probs)), decreasing = TRUE)
+res = 100*Reduce(cbind,lapply(xaxis, function(prob){
+  useonly = which(probs >= 1-prob)
+  c(length(useonly)/length(test_actual), sum(test_actual[useonly])/all1s) 
+  }))
+xaxis = res[1,]; yaxis = res[2,]
+names(xaxis)<- NULL; names(yaxis) <- NULL
+frame<-cbind(xaxis,yaxis)
+frame<-as.data.frame(frame)
+LineFrame1   <- gvisLineChart(frame, xvar=c("xaxis"), yvar="yaxis", options=list(title='Lift Curve for test data CART large', legend="right", width=600, height=400, hAxis="{title:'Percent of data', titleTextStyle:{color:'black'}}", vAxes="[{title:'Percent of Class 1'}]",  series="[{color:'green',pointSize:3, targetAxisIndex: 0}]"))
+print(LineFrame1,'chart')
+
+probs = test_Probability_class1_log
+xaxis = sort(unique(c(0,1,probs)), decreasing = TRUE)
+res = 100*Reduce(cbind,lapply(xaxis, function(prob){
+  useonly = which(probs >= 1-prob)
+  c(length(useonly)/length(test_actual), sum(test_actual[useonly])/all1s) 
+  }))
+xaxis = res[1,]; yaxis = res[2,]
+names(xaxis)<- NULL; names(yaxis) <- NULL
+frame<-cbind(xaxis,yaxis)
+frame<-as.data.frame(frame)
+LineFrame2  <- gvisLineChart(frame, xvar=c("xaxis"), yvar="yaxis", options=list(title='Lift Curve for test data CART large', legend="right", width=600, height=400, hAxis="{title:'Percent of data', titleTextStyle:{color:'black'}}", vAxes="[{title:'Percent of Class 1'}]",  series="[{color:'green',pointSize:3, targetAxisIndex: 0}]"))
+print(LineFrame2,'chart')
+
+```
+</div>
+</br>
+
+Finally the profit curves for the test data, using the same profit/cost estimates as we did above:
+
+<style>
+.wrapper{
+
+
+width: 100%;
+
+overflow-x: scroll;
+
+}
+.wrapper1{
+
+height:450px;
+overflow-y: scroll;
+}
+</style>
+<div class="wrapper wrapper1">
+
+```{r echo=FALSE,results='asis',warning=FALSE,error=FALSE}
+
+actual_class<- test_data[,dependent_variable]
+
+probs = test_Probability_class1_tree
+xaxis = sort(unique(c(0,1,probs)), decreasing = TRUE)
+res = Reduce(cbind,lapply(xaxis, function(prob){
+  useonly = which(probs >= prob)
+  predict_class = 1*(probs >= prob)
+  theprofit = Profit_Matrix[1,1]*sum(predict_class==1 & actual_class ==1)+
+    Profit_Matrix[1,2]*sum(predict_class==0 & actual_class ==1)+
+    Profit_Matrix[2,1]*sum(predict_class==1 & actual_class ==0)+
+    Profit_Matrix[2,2]*sum(predict_class==0 & actual_class ==0)
+  
+  c(100*length(useonly)/length(actual_class), theprofit) 
+  }))
+xaxis = res[1,]; yaxis = res[2,]
+names(xaxis)<- NULL; names(yaxis) <- NULL
+frame<-cbind(xaxis,yaxis)
+frame<-as.data.frame(frame)
+LineFramev1   <- gvisLineChart(frame, xvar=c("xaxis"), yvar="yaxis", options=list(title='Profit Curve for test data CART 1', legend="right", width=600, height=600, hAxis="{title:'Percent Selected', titleTextStyle:{color:'black'}}", vAxes="[{title:'Estimated Profit'}]",  series="[{color:'green',pointSize:3, targetAxisIndex: 0}]"))
+print(LineFramev1,'chart')
+
+probs = test_Probability_class1_tree_large
+xaxis = sort(unique(c(0,1,probs)), decreasing = TRUE)
+res = Reduce(cbind,lapply(xaxis, function(prob){
+  useonly = which(probs >= prob)
+  predict_class = 1*(probs >= prob)
+  theprofit = Profit_Matrix[1,1]*sum(predict_class==1 & actual_class ==1)+
+    Profit_Matrix[1,2]*sum(predict_class==0 & actual_class ==1)+
+    Profit_Matrix[2,1]*sum(predict_class==1 & actual_class ==0)+
+    Profit_Matrix[2,2]*sum(predict_class==0 & actual_class ==0)
+  
+  c(100*length(useonly)/length(actual_class), theprofit) 
+  }))
+xaxis = res[1,]; yaxis = res[2,]
+names(xaxis)<- NULL; names(yaxis) <- NULL
+frame<-cbind(xaxis,yaxis)
+frame<-as.data.frame(frame)
+LineFramev2   <- gvisLineChart(frame, xvar=c("xaxis"), yvar="yaxis", options=list(title='Profit Curve for test data CART 2', legend="right", width=600, height=400, hAxis="{title:'Percent Selected', titleTextStyle:{color:'black'}}", vAxes="[{title:'Estimated Profit'}]",  series="[{color:'green',pointSize:3, targetAxisIndex: 0}]"))
+print(LineFramev2,'chart')
+
+probs = test_Probability_class1_log
+xaxis = sort(unique(c(0,1,probs)), decreasing = TRUE)
+res = Reduce(cbind,lapply(xaxis, function(prob){
+  useonly = which(probs >= prob)
+  predict_class = 1*(probs >= prob)
+  theprofit = Profit_Matrix[1,1]*sum(predict_class==1 & actual_class ==1)+
+    Profit_Matrix[1,2]*sum(predict_class==0 & actual_class ==1)+
+    Profit_Matrix[2,1]*sum(predict_class==1 & actual_class ==0)+
+    Profit_Matrix[2,2]*sum(predict_class==0 & actual_class ==0)
+  
+  c(100*length(useonly)/length(actual_class), theprofit) 
+  }))
+xaxis = res[1,]; yaxis = res[2,]
+names(xaxis)<- NULL; names(yaxis) <- NULL
+frame<-cbind(xaxis,yaxis)
+frame<-as.data.frame(frame)
+LineFramev3   <- gvisLineChart(frame, xvar=c("xaxis"), yvar="yaxis", options=list(title='Profit Curve for test data logistic regression', legend="right", width=600, height=400, hAxis="{title:'Percent Selected', titleTextStyle:{color:'black'}}", vAxes="[{title:'Estimated Profit'}]",  series="[{color:'green',pointSize:3, targetAxisIndex: 0}]"))
+print(LineFramev3,'chart')
+```
+</div>
