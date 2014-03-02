@@ -45,15 +45,15 @@ We can create 3 segments using the scores from factor analysis and they are as f
 
 ## Matured clients
 
-These customers are mature businesses and there are total `r nrow(ProjectData[ProjectData[,"Cluster_Membership"]==1,])` clients (`r round(100*nrow(ProjectData[ProjectData[,"Cluster_Membership"]==1,])/nrow(ProjectData), 2)`% of whole dataset). They needs their supplier to have an efficient and reliable ordering process, delivery & inventory management, and formula based or fixed material price. This shows that they are more matured and process based clients and they want certainty and predictability in their cost. This is strengthened more by having `r round(100*(cluster_profile_ratios["MAXDIFF: Credit limit. financing and payment terms",1]-1),2)` percent higher than population average in needs of credit limit, financing and payment terms and the highest among 3 segments.
+These customers are mature businesses and there are total `r nrow(ProjectData[ProjectData[,"Cluster_Membership"]==1,])` clients (`r round(100*nrow(ProjectData[ProjectData[,"Cluster_Membership"]==1,])/nrow(ProjectData), 2)`% of whole dataset). They needs their supplier to have an efficient and reliable ordering process, delivery & inventory management, and formula based or fixed material price. This shows that they are more matured and process based clients and they want certainty and predictability in their cost of ordering. This is strengthened more by having scores of `r round(100*(cluster_profile_ratios["MAXDIFF: Credit limit. financing and payment terms",1]-1),2)` percent higher than population average in needs of credit limit, financing and payment terms, which is the highest among 3 segments.
 
-Since they are already matured, clients from this segment do not care and need collaboration for growth, global service and operations, and business services. They know/have specific kind of material they require and they do not need their supplier to have broad material portfolio.
+Since they are already matured, clients from this segment do not need collaboration for growth, global service and operations, and business services. They have specific kind of material they require and they do not need their supplier to have broad material portfolio.
 
 ---
 
 ## Entry level clients
 
-These customers are entry level business and they are total `r nrow(ProjectData[ProjectData[,"Cluster_Membership"]==2,])` clients (`r round(100*nrow(ProjectData[ProjectData[,"Cluster_Membership"]==2,])/nrow(ProjectData), 2)`% of whole dataset). Since they are entry level businesses, they are willing to collaborate for growth and they needs their supplier support towards their sustainabile goals. Being an entry level businesses, they also want dedicated account manager relationship and they need their supplier to have a strong business services and global service and operations. 
+These customers are entry level business and they are total `r nrow(ProjectData[ProjectData[,"Cluster_Membership"]==2,])` clients (`r round(100*nrow(ProjectData[ProjectData[,"Cluster_Membership"]==2,])/nrow(ProjectData), 2)`% of whole dataset). Since they are entry level businesses, they are willing to collaborate for growth and they needs their supplier support towards their sustainable goals. Being entry level businesses, they also want dedicated account manager relationship and they need their supplier to have a strong business services and global service and operations. 
 
 Strangely, they are not very much interested in material coloring solutions and broad material portfolio. This may be because they are entry level businesses and they still do not need sophisticated and advanced services. Most importantly, they paid premium in the past more than population average and therefore, they are valuable customers. However, they have highest average score in "willing to change supplier" with `r round(cluster_profile_ratios["Willing to Changing suppliers",2],2)` among all segments. So, we need to pay more attention to this segments as this segment has a lot of room to improve and can grow the business.
 
@@ -61,7 +61,7 @@ Strangely, they are not very much interested in material coloring solutions and 
 
 ## Support oriented and cash rich clients
 
-These customers are support oriented and cash rich clients and they are total `r nrow(ProjectData[ProjectData[,"Cluster_Membership"]==3,])` clients (`r round(100*nrow(ProjectData[ProjectData[,"Cluster_Membership"]==3,])/nrow(ProjectData), 2)`% of whole dataset). They rate highly generally on support related questions such as material selection support, processing support, and application development support. Interestingly, they need supplier with significantly broad material portfolio and material coloring solutions. May be because their need of products are diversed and therefore, they rate less for fixed material price (check below). As support oriented clients, they are more interested to collaborate during innovation process than collaboration for growth. 
+These customers are support oriented and cash rich clients and they are total `r nrow(ProjectData[ProjectData[,"Cluster_Membership"]==3,])` clients (`r round(100*nrow(ProjectData[ProjectData[,"Cluster_Membership"]==3,])/nrow(ProjectData), 2)`% of whole dataset). They rate highly generally on support related needs such as material selection support, processing support, and application development support. Interestingly, they need supplier with significantly broad material portfolio and material coloring solutions because, possibly, their need of products are diversed. Therefore, they rate less for fixed material price. As support oriented clients, they are more interested in collaboration during innovation process than collaboration for growth.
 
 They definitely are cash rish clients. They rate generally lower than population average for cost related needs such as total system cost reduction and formula based or fixed material price. They do not need credit limit, financing and payment terms. This segment of clients paid premium the most among all the segments and least willing to change supplier.
 
@@ -103,14 +103,14 @@ Following are selected significant ratio of segment average over population aver
 
 Following are selected significant ratio of segment average over population average for support oriented and cash rich clients :
 
-1. Material selection support (`r round(cluster_profile_ratios["MAXDIFF: Material selection support",3],2)`)
-2. Processing support (`r round(cluster_profile_ratios["MAXDIFF: Processing support",3],2)`)
-3. Application development support (`r round(cluster_profile_ratios["MAXDIFF: Application development support",3],2)`)
-4. Broad material portfolio (`r round(cluster_profile_ratios["MAXDIFF: Broad material portfolio",3],2)`) 
-5. Material coloring solutions (`r round(cluster_profile_ratios["MAXDIFF: Material coloring solutions",3],2)`)
-6. Collaboration during innovation process (`r round(cluster_profile_ratios["MAXDIFF: Collaboration during your innovation process",3],2)`)
-7. Total system cost reduction (`r round(cluster_profile_ratios["MAXDIFF: Total system cost reduction",3],2)`) 
-8. Formula based or fixed material price (`r round(cluster_profile_ratios["MAXDIFF: Formula based or fixed material price",3],2)`)
-9. Credit limit, financing and payment terms (`r round(cluster_profile_ratios["MAXDIFF: Credit limit. financing and payment terms",3],2)`)
-10. Paid premium in the past (`r round(cluster_profile_ratios["Paid premium in past",3],2)`)
+1. Broad material portfolio (`r round(cluster_profile_ratios["MAXDIFF: Broad material portfolio",3],2)`) 
+2. Material coloring solutions (`r round(cluster_profile_ratios["MAXDIFF: Material coloring solutions",3],2)`)
+3. Material selection support (`r round(cluster_profile_ratios["MAXDIFF: Material selection support",3],2)`)
+4. Application development support (`r round(cluster_profile_ratios["MAXDIFF: Application development support",3],2)`)
+5. Processing support (`r round(cluster_profile_ratios["MAXDIFF: Processing support",3],2)`)
+6. Paid premium in the past (`r round(cluster_profile_ratios["Paid premium in past",3],2)`)
+7. Collaboration during innovation process (`r round(cluster_profile_ratios["MAXDIFF: Collaboration during your innovation process",3],2)`)
+8. Credit limit, financing and payment terms (`r round(cluster_profile_ratios["MAXDIFF: Credit limit. financing and payment terms",3],2)`)
+9. Total system cost reduction (`r round(cluster_profile_ratios["MAXDIFF: Total system cost reduction",3],2)`) 
+10. Formula based or fixed material price (`r round(cluster_profile_ratios["MAXDIFF: Formula based or fixed material price",3],2)`)
 11. Willing to change supplier (`r round(cluster_profile_ratios["Willing to Changing suppliers",3],2)`)
