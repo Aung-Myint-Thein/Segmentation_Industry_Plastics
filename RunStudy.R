@@ -1,5 +1,7 @@
 # Project Name: "Segmentation_Industry_Plastics"
 rm(list = ls( )) # clean up the workspace
+
+# set the random seed for duplicability
 set.seed(123444222)
 ######################################################################
 
@@ -23,15 +25,17 @@ cat("\n *********\n WORKING DIRECTORY IS ", local_directory, "\n PLEASE CHANGE I
 datafile_name="Plastics" # do not add .csv at the end! make sure the data are numeric!!!! check your file!
 
 # Please ENTER the filename of the Report and Slides (in the doc directory) to generate 
+# Slides used the variables from Report_A
 
 #report_file = "Report"
-report_file = "Report_B"
+report_file = "Report_A"
 slides_file = "Slides"
 
 # Please ENTER then original raw attributes to use. 
 # Please use numbers, not column names! e.g. c(1:5, 7, 8) uses columns 1,2,3,4,5,7,8
 factor_attributes_used= c(3:22)
 
+# total number of attributes (This is only for report and no need to edit)
 total_arributes <- c(3:44)
 
 # Please ENTER the selection criterions for the factors to use. 
@@ -49,9 +53,10 @@ manual_numb_factors_used = 10
 # Please ENTER the rotation eventually used (e.g. "none", "varimax", "quatimax", "promax", "oblimin", "simplimax", and "cluster" - see help(principal)). Defauls is "varimax"
 rotation_used="varimax"
 
+######################## Segmentation variables start here
 
-# cluster start
-
+## Please enter 1 if you want to use the factor scores for segmentation
+## Please enter 0 if you want to use segmentation_attributes_used for segmentation
 use_factor_scores <- 1
 
 # Please ENTER then original raw attributes to use for the segmentation (the "segmentation attributes")
@@ -89,9 +94,7 @@ hclust_method = "ward"
 # DEFAULT is "Lloyd"
 kmeans_method = "Lloyd"
 
-# end cluster
-
-# classification starts
+############ classification variables start here
 
 # Please ENTER the class (dependent) variable:
 # Please use numbers, not column names! e.g. 82 uses the 82nd column are dependent variable.
@@ -125,13 +128,11 @@ random_sampling = 0
 # PLEASE ENTER THE Tree (CART) complexity control cp (e.g. 0.001 to 0.02, depending on the data)
 CART_cp = 0.01
 
+# Please enter the ID of the cluster to use in classification
 Cluster_to_test <- 2
 
 # Please enter the minimum size of a segment for the analysis to be done only for that segment
 min_segment = 100
-
-
-# end classification
 
 # Please enter the minimum number below which you would like not to print - this makes the readability of the tables easier. Default values are either 10e6 (to print everything) or 0.5. Try both to see the difference.
 MIN_VALUE=0.5
@@ -182,8 +183,6 @@ if (require(shiny) == FALSE)
   install_libraries("shiny")
 source(paste(local_directory,"R/heatmapOutput.R", sep = "/"))
 source(paste(local_directory,"R/runcode.R", sep = "/"))
-
-
 
 if (start_local_webapp){
   
