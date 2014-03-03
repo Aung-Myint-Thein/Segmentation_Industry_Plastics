@@ -8,54 +8,470 @@
   <meta name="generator" content="slidify" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
-  <link rel="stylesheet" href="http://slidifylibraries2.googlecode.com/git/inst/libraries/frameworks/io2012/css/default.css" media="all" >
-  <link rel="stylesheet" href="http://slidifylibraries2.googlecode.com/git/inst/libraries/frameworks/io2012/css/phone.css" 
+  <link rel="stylesheet" href="http://slidifylibraries.googlecode.com/git/inst/libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="http://slidifylibraries.googlecode.com/git/inst/libraries/frameworks/io2012/phone.css" 
     media="only screen and (max-device-width: 480px)" >
-  <link rel="stylesheet" href="http://slidifylibraries2.googlecode.com/git/inst/libraries/frameworks/io2012/css/slidify.css" >
-  <link rel="stylesheet" href="http://slidifylibraries2.googlecode.com/git/inst/libraries/highlighters/highlight.js/css/tomorrow.css" />
-  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  
-  
-  <!-- Grab CDN jQuery, fall back to local if offline -->
-  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
-  <script>window.jQuery || document.write('<script src="http://slidifylibraries2.googlecode.com/git/inst/libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
-  <script data-main="http://slidifylibraries2.googlecode.com/git/inst/libraries/frameworks/io2012/js/slides" 
-    src="http://slidifylibraries2.googlecode.com/git/inst/libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  <link rel="stylesheet" href="http://slidifylibraries.googlecode.com/git/inst/libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="http://slidifylibraries.googlecode.com/git/inst/libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->
+  <script data-main="http://slidifylibraries.googlecode.com/git/inst/libraries/frameworks/io2012/js/slides" 
+    src="http://slidifylibraries.googlecode.com/git/inst/libraries/frameworks/io2012/js/require-1.0.8.min.js">
   </script>
   
-  
-
+    
 </head>
 <body style="opacity: 0">
   <slides class="layout-widescreen">
     
     <!-- LOGO SLIDE -->
-        <slide class="title-slide segue nobackground">
-  <hgroup class="auto-fadein">
-    <h1>(Big) Data Analytics for Business</h1>
-    <h2>Segmentation in the Plastics Industry</h2>
-    <p>Aung Myint Thein<br/>INSEAD eLab</p>
-  </hgroup>
-  <article></article>  
-</slide>
+    <!-- END LOGO SLIDE -->
     
 
+    <!-- TITLE SLIDE -->
+    <!-- Should I move this to a Local Layout File? -->
+    <slide class="title-slide segue nobackground">
+      <hgroup class="auto-fadein">
+        <h1>(Big) Data Analytics for Business</h1>
+        <h2>Segmentation in the Plastics Industry</h2>
+        <p>Aung Myint Thein<br/>INSEAD eLab</p>
+      </hgroup>
+          </slide>
+
     <!-- SLIDES -->
-    <slide class="" id="slide-1" style="background:;">
+      <slide class="" id="slide-1" style="background:;">
   <hgroup>
     <h2>Factor Analysis</h2>
   </hgroup>
-  <article data-timings="">
-    <p>From factor analysis, we have decided to keep 10 factors, which can cover 78.44% of the variance in the original dataset, from the survey&#39;s 20 different needs.</p>
+  <article>
+    <p><br></p>
+
+<style>
+.wrapper{
+height: 120%;
+width: 900px;
+overflow: auto;
+}
+</style>
+
+<div class="wrapper" style="font-size:18px;">
+<div class="row">
+<div class="col-md-3">
+<!-- Table generated in R 3.0.2 by googleVis 0.4.7 package -->
+<!-- Mon Mar 03 14:20:36 2014 -->
+
+
+<!-- jsHeader -->
+<script type="text/javascript">
+ 
+// jsData 
+function gvisDataTableID69854c21f79 () {
+var data = new google.visualization.DataTable();
+var datajson =
+[
+ [
+ "Component No:1",
+5.325907369,
+26.62953684 
+],
+[
+ "Component No:2",
+1.677938918,
+35.01923143 
+],
+[
+ "Component No:3",
+1.592911551,
+42.98378919 
+],
+[
+ "Component No:4",
+1.315567007,
+49.56162423 
+],
+[
+ "Component No:5",
+1.219429649,
+55.65877247 
+],
+[
+ "Component No:6",
+1.058597402,
+60.95175948 
+],
+[
+ "Component No:7",
+0.9880623836,
+65.8920714 
+],
+[
+ "Component No:8",
+0.892548547,
+70.35481413 
+],
+[
+ "Component No:9",
+0.8626233125,
+74.6679307 
+],
+[
+ "Component No:10",
+0.7541409977,
+78.43863568 
+],
+[
+ "Component No:11",
+0.7405112814,
+82.14119209 
+],
+[
+ "Component No:12",
+0.617104902,
+85.2267166 
+],
+[
+ "Component No:13",
+0.5984527345,
+88.21898027 
+],
+[
+ "Component No:14",
+0.5614145791,
+91.02605317 
+],
+[
+ "Component No:15",
+0.4989023591,
+93.52056496 
+],
+[
+ "Component No:16",
+0.4317364505,
+95.67924722 
+],
+[
+ "Component No:17",
+0.324102034,
+97.29975739 
+],
+[
+ "Component No:18",
+0.2891719897,
+98.74561734 
+],
+[
+ "Component No:19",
+0.2508765329,
+100 
+],
+[
+ "Component No:20",
+5.039894514e-15,
+100 
+] 
+];
+data.addColumn('string','Components');
+data.addColumn('number','Eigenvalue');
+data.addColumn('number','Cumulative_percentage_of_explained_variance');
+data.addRows(datajson);
+return(data);
+}
+ 
+// jsDrawChart
+function drawChartTableID69854c21f79() {
+var data = gvisDataTableID69854c21f79();
+var options = {};
+options["allowHtml"] = true;
+options["width"] =    900;
+options["height"] =    450;
+options["allowHTML"] = true;
+options["page"] = "disable";
+
+  var dataFormat1 = new google.visualization.NumberFormat({pattern:"#.##"});
+  dataFormat1.format(data, 1);
+  var dataFormat2 = new google.visualization.NumberFormat({pattern:"#.##"});
+  dataFormat2.format(data, 2);
+
+    var chart = new google.visualization.Table(
+    document.getElementById('TableID69854c21f79')
+    );
+    chart.draw(data,options);
+    
+
+}
+  
+ 
+// jsDisplayChart
+(function() {
+var pkgs = window.__gvisPackages = window.__gvisPackages || [];
+var callbacks = window.__gvisCallbacks = window.__gvisCallbacks || [];
+var chartid = "table";
+  
+// Manually see if chartid is in pkgs (not all browsers support Array.indexOf)
+var i, newPackage = true;
+for (i = 0; newPackage && i < pkgs.length; i++) {
+if (pkgs[i] === chartid)
+newPackage = false;
+}
+if (newPackage)
+  pkgs.push(chartid);
+  
+// Add the drawChart function to the global list of callbacks
+callbacks.push(drawChartTableID69854c21f79);
+})();
+function displayChartTableID69854c21f79() {
+  var pkgs = window.__gvisPackages = window.__gvisPackages || [];
+  var callbacks = window.__gvisCallbacks = window.__gvisCallbacks || [];
+  window.clearTimeout(window.__gvisLoad);
+  // The timeout is set to 100 because otherwise the container div we are
+  // targeting might not be part of the document yet
+  window.__gvisLoad = setTimeout(function() {
+  var pkgCount = pkgs.length;
+  google.load("visualization", "1", { packages:pkgs, callback: function() {
+  if (pkgCount != pkgs.length) {
+  // Race condition where another setTimeout call snuck in after us; if
+  // that call added a package, we must not shift its callback
+  return;
+}
+while (callbacks.length > 0)
+callbacks.shift()();
+} });
+}, 100);
+}
+ 
+// jsFooter
+</script>
+ 
+<!-- jsChart -->  
+<script type="text/javascript" src="https://www.google.com/jsapi?callback=displayChartTableID69854c21f79"></script>
+ 
+<!-- divChart -->
+  
+<div id="TableID69854c21f79"
+  style="width: 900px; height: 450px;">
+</div>
+
+<p></div>
+</div>
+</div></p>
 
   </article>
   <!-- Presenter Notes -->
 </slide>
 
-<slide class="" id="slide-2" style="background:;">
+      <slide class="" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>Factor Analysis</h2>
+  </hgroup>
+  <article>
+    <!-- LineChart generated in R 3.0.2 by googleVis 0.4.7 package -->
+
+<!-- Mon Mar 03 14:20:36 2014 -->
+
+<!-- jsHeader -->
+
+<script type="text/javascript">
+ 
+// jsData 
+function gvisDataLineChartID698d6e344c () {
+var data = new google.visualization.DataTable();
+var datajson =
+[
+ [
+ "1",
+5.325907369,
+1 
+],
+[
+ "2",
+1.677938918,
+1 
+],
+[
+ "3",
+1.592911551,
+1 
+],
+[
+ "4",
+1.315567007,
+1 
+],
+[
+ "5",
+1.219429649,
+1 
+],
+[
+ "6",
+1.058597402,
+1 
+],
+[
+ "7",
+0.9880623836,
+1 
+],
+[
+ "8",
+0.892548547,
+1 
+],
+[
+ "9",
+0.8626233125,
+1 
+],
+[
+ "10",
+0.7541409977,
+1 
+],
+[
+ "11",
+0.7405112814,
+1 
+],
+[
+ "12",
+0.617104902,
+1 
+],
+[
+ "13",
+0.5984527345,
+1 
+],
+[
+ "14",
+0.5614145791,
+1 
+],
+[
+ "15",
+0.4989023591,
+1 
+],
+[
+ "16",
+0.4317364505,
+1 
+],
+[
+ "17",
+0.324102034,
+1 
+],
+[
+ "18",
+0.2891719897,
+1 
+],
+[
+ "19",
+0.2508765329,
+1 
+],
+[
+ "20",
+5.039894514e-15,
+1 
+] 
+];
+data.addColumn('string','components');
+data.addColumn('number','eigenvalues');
+data.addColumn('number','abline');
+data.addRows(datajson);
+return(data);
+}
+ 
+// jsDrawChart
+function drawChartLineChartID698d6e344c() {
+var data = gvisDataLineChartID698d6e344c();
+var options = {};
+options["allowHtml"] = true;
+options["title"] = "Scree plot";
+options["legend"] = "right";
+options["width"] =    700;
+options["height"] =    400;
+options["hAxis"] = {title:'Number of Components', titleTextStyle:{color:'black'}};
+options["vAxes"] = [{title:'Eigenvalues'}];
+options["series"] = [{color:'green',pointSize:3, targetAxisIndex: 0}];
+
+    var chart = new google.visualization.LineChart(
+    document.getElementById('LineChartID698d6e344c')
+    );
+    chart.draw(data,options);
+    
+
+}
+  
+ 
+// jsDisplayChart
+(function() {
+var pkgs = window.__gvisPackages = window.__gvisPackages || [];
+var callbacks = window.__gvisCallbacks = window.__gvisCallbacks || [];
+var chartid = "corechart";
+  
+// Manually see if chartid is in pkgs (not all browsers support Array.indexOf)
+var i, newPackage = true;
+for (i = 0; newPackage && i < pkgs.length; i++) {
+if (pkgs[i] === chartid)
+newPackage = false;
+}
+if (newPackage)
+  pkgs.push(chartid);
+  
+// Add the drawChart function to the global list of callbacks
+callbacks.push(drawChartLineChartID698d6e344c);
+})();
+function displayChartLineChartID698d6e344c() {
+  var pkgs = window.__gvisPackages = window.__gvisPackages || [];
+  var callbacks = window.__gvisCallbacks = window.__gvisCallbacks || [];
+  window.clearTimeout(window.__gvisLoad);
+  // The timeout is set to 100 because otherwise the container div we are
+  // targeting might not be part of the document yet
+  window.__gvisLoad = setTimeout(function() {
+  var pkgCount = pkgs.length;
+  google.load("visualization", "1", { packages:pkgs, callback: function() {
+  if (pkgCount != pkgs.length) {
+  // Race condition where another setTimeout call snuck in after us; if
+  // that call added a package, we must not shift its callback
+  return;
+}
+while (callbacks.length > 0)
+callbacks.shift()();
+} });
+}, 100);
+}
+ 
+// jsFooter
+</script>
+ 
+
+<!-- jsChart -->  
+
+<script type="text/javascript" src="https://www.google.com/jsapi?callback=displayChartLineChartID698d6e344c"></script>
+ 
+
+<!-- divChart -->
+
+<div id="LineChartID698d6e344c"
+  style="width: 700px; height: 400px;">
+</div>
+
+<p><br></p>
+
+<p>From factor analysis, statistically, we can decide to use only 6 factors using scree plot. However, we have decided to keep 10 factors, which can cover 78.44% of the variance in the original dataset, from the survey&#39;s 20 different needs.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+      <slide class="" id="slide-3" style="background:;">
   <hgroup>
     <h2>Factors</h2>
   </hgroup>
-  <article data-timings="">
+  <article>
     <p>Using factor loadings, we can call our 10 factors as following:</p>
 
 <ol>
@@ -75,11 +491,11 @@
   <!-- Presenter Notes -->
 </slide>
 
-<slide class="" id="slide-3" style="background:;">
+      <slide class="" id="slide-4" style="background:;">
   <hgroup>
     <h2>Cluster Analysis</h2>
   </hgroup>
-  <article data-timings="">
+  <article>
     <p>We can create 3 segments using the scores from factor analysis and they are as following :</p>
 
 <ol>
@@ -88,15 +504,17 @@
 <li><p>Support oriented and cash rich clients</p></li>
 </ol>
 
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAogAAAFoCAMAAADjO/qXAAAAnFBMVEX9/v0AAAAAADkAAGUAAP8AOWUAOY8AZo8AZrU5AAA5ADk5AGU5OQA5OWU5OY85ZmU5ZrU5j9plAABlADllAGVlOQBlOTllZjllZmVltbVltf2POQCPOTmPOWWPZgCPj2WPtY+P29qP2/21ZgC1Zjm1tWW124+1/rW1/v3ajzna/rXa/tra/v39tWX924/9/rX9/tr9/v3/AAD/gAAZL+3IAAAANHRSTlP/////////////////////////////////////////////////////////////////AP//2M35BQAAAAlwSFlzAAALEgAACxIB0t1+/AAAGp5JREFUeJztnQt747aVhiuHTe3MdrbypN1de9om1m46SkeySf3//7bEhSQuByBAguKR+L1PMpJ4ASDiNQACIPSHGgAG/GHtBAAggIiABRARsAAiAhZARMACiAhYABEBCyAiYAFEBCyAiIAFEBGwACICFkBEwAKICFgAEQELICJgAUQELICIgAUQEbAAIgIWQETAAogIWAARAQsgImABRAQs2KaI78+73Y/fqe0/fIudZe09vKjX89Pu4S0j8o9XIpJAzF0c988mRRQe7naP1I50EQ+7F+dNIhki5gZ9w2xSxPPTj99FzrdK/N9uJww4tWK2xZraKHL/2G7QEvRHKVnEnn27Uass37Slq9rcfnz4r66A7MLQgctD2xDa8H572nXe6Y06OeJNG1hbyO5kSmQcOhwz6PtjoyIqyWROi7xWRaSy8yj2HeSOfW0cpfbqPY+uiHpz72U9hNEFrsLRfnUFcrfRElGf8W8VRxeOEfQdskkRZZbKsqnN35POXKFC+/9vT3tVZPZVqDyqdeNFHHF+kgVn+49VNfeb24N1lW+FoU6VHr/I8OReeZTaaInY7dRB63CGoO+RTYqoSiuRtVIfkeuiEBIiPvyH8OskCyFdDyqZjru9kOUkZRClpiViv1kGKTHCUIGf+hK2j1UcpTb6JaKIVAWtwxmCvkc2KqKqno0iqKsglQFFRewCP/W1cdcUlEepjX4bcadLXYh4vxxF7h8MEY+yslQttaNRcUoyq+bOlj6MLnBZC7cfLBG7jf1t0nFnVMt91azSARHvjK6M6pVQpY4S0bglUQaQNyuydleF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" title="plot of chunk unnamed-chunk-2" alt="plot of chunk unnamed-chunk-2" style="display: block; margin: auto;" /></p>
+
   </article>
   <!-- Presenter Notes -->
 </slide>
 
-<slide class="" id="slide-4" style="background:;">
+      <slide class="" id="slide-5" style="background:;">
   <hgroup>
     <h2>Matured clients</h2>
   </hgroup>
-  <article data-timings="">
+  <article>
     <p>These customers are mature businesses and there are total 315 clients (17.75% of whole dataset). They needs their supplier to have an efficient and reliable ordering process, delivery &amp; inventory management, and formula based or fixed material price. This shows that they are more matured and process based clients and they want certainty and predictability in their cost of ordering. This is strengthened more by having scores of 18.7 percent higher than population average in needs of credit limit, financing and payment terms, which is the highest among 3 segments.</p>
 
 <p>Since they are already matured, clients from this segment do not need collaboration for growth, global service and operations, and business services. They have specific kind of material they require and they do not need their supplier to have broad material portfolio.</p>
@@ -105,11 +523,11 @@
   <!-- Presenter Notes -->
 </slide>
 
-<slide class="" id="slide-5" style="background:;">
+      <slide class="" id="slide-6" style="background:;">
   <hgroup>
     <h2>Entry level clients</h2>
   </hgroup>
-  <article data-timings="">
+  <article>
     <p>These customers are entry level business and they are total 798 clients (44.96% of whole dataset). Since they are entry level businesses, they are willing to collaborate for growth and they needs their supplier support towards their sustainable goals. Being entry level businesses, they also want dedicated account manager relationship and they need their supplier to have a strong business services and global service and operations. </p>
 
 <p>Strangely, they are not very much interested in material coloring solutions and broad material portfolio. This may be because they are entry level businesses and they still do not need sophisticated and advanced services. Most importantly, they paid premium in the past more than population average and therefore, they are valuable customers. However, they have highest average score in &quot;willing to change supplier&quot; with 1.02 among all segments. So, we need to pay more attention to this segments as this segment has a lot of room to improve and can grow the business.</p>
@@ -118,11 +536,11 @@
   <!-- Presenter Notes -->
 </slide>
 
-<slide class="" id="slide-6" style="background:;">
+      <slide class="" id="slide-7" style="background:;">
   <hgroup>
     <h2>Support oriented and cash rich clients</h2>
   </hgroup>
-  <article data-timings="">
+  <article>
     <p>These customers are support oriented and cash rich clients and they are total 662 clients (37.3% of whole dataset). They rate highly generally on support related needs such as material selection support, processing support, and application development support. Interestingly, they need supplier with significantly broad material portfolio and material coloring solutions because, possibly, their need of products are diversed. Therefore, they rate less for fixed material price. As support oriented clients, they are more interested in collaboration during innovation process than collaboration for growth.</p>
 
 <p>They definitely are cash rish clients. They rate generally lower than population average for cost related needs such as total system cost reduction and formula based or fixed material price. They do not need credit limit, financing and payment terms. This segment of clients paid premium the most among all the segments and least willing to change supplier.</p>
@@ -131,11 +549,11 @@
   <!-- Presenter Notes -->
 </slide>
 
-<slide class="" id="slide-7" style="background:;">
+      <slide class="" id="slide-8" style="background:;">
   <hgroup>
-    <h2>Appendix</h2>
+    <h2>Appendix 1</h2>
   </hgroup>
-  <article data-timings="">
+  <article>
     <p>Following are selected significant ratio of segment average over population average for matured clients :</p>
 
 <ol>
@@ -153,11 +571,11 @@
   <!-- Presenter Notes -->
 </slide>
 
-<slide class="" id="slide-8" style="background:;">
+      <slide class="" id="slide-9" style="background:;">
   <hgroup>
-    <h2>Appendix</h2>
+    <h2>Appendix 2</h2>
   </hgroup>
-  <article data-timings="">
+  <article>
     <p>Following are selected significant ratio of segment average over population average for entry level clients :</p>
 
 <ol>
@@ -176,11 +594,11 @@
   <!-- Presenter Notes -->
 </slide>
 
-<slide class="" id="slide-9" style="background:;">
+      <slide class="" id="slide-10" style="background:;">
   <hgroup>
-    <h2>Appendix</h2>
+    <h2>Appendix 3</h2>
   </hgroup>
-  <article data-timings="">
+  <article>
     <p>Following are selected significant ratio of segment average over population average for support oriented and cash rich clients :</p>
 
 <ol>
@@ -201,77 +619,220 @@
   <!-- Presenter Notes -->
 </slide>
 
+      <slide class="" id="slide-11" style="background:;">
+  <hgroup>
+    <h2>Appendix 4</h2>
+  </hgroup>
+  <article>
+    <p>Following are ratios of segment average over population average for profiling variables:
+<br></p>
+
+<div class="wrapper" style="font-size:20px;">
+<div class="row">
+<div class="col-md-6">
+<table border="1" class="data table table-bordered table-condensed">
+  <thead class="thead">
+    <tr>
+      <th></th>
+      <th>Segment 1</th>
+      <th>Segment 2</th>
+      <th>Segment 3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="right">MAXDIFF: Material selection support</td>
+      <td align="right" style="background-color: rgb(255,256,256)">0.9907</td>
+      <td align="right" style="background-color: rgb(255,143,143)">0.8269</td>
+      <td align="right" style="background-color: rgb(206,255,206)">1.263</td>
+    </tr>
+    <tr>
+      <td align="right">MAXDIFF: Processing support</td>
+      <td align="right" style="background-color: rgb(255,256,256)">1.037</td>
+      <td align="right" style="background-color: rgb(255,158,158)">0.8504</td>
+      <td align="right" style="background-color: rgb(232,255,232)">1.125</td>
+    </tr>
+    <tr>
+      <td align="right">MAXDIFF: Application development support</td>
+      <td align="right" style="background-color: rgb(255,256,256)">0.9534</td>
+      <td align="right" style="background-color: rgb(255,256,256)">0.9716</td>
+      <td align="right" style="background-color: rgb(229,255,229)">1.144</td>
+    </tr>
+    <tr>
+      <td align="right">MAXDIFF: Total system cost reduction</td>
+      <td align="right" style="background-color: rgb(228,255,228)">1.15</td>
+      <td align="right" style="background-color: rgb(255,256,256)">0.9564</td>
+      <td align="right" style="background-color: rgb(255,76,76)">0.7245</td>
+    </tr>
+    <tr>
+      <td align="right">MAXDIFF: Efficient and reliable ordering process</td>
+      <td align="right" style="background-color: rgb(217,255,217)">1.206</td>
+      <td align="right" style="background-color: rgb(255,130,130)">0.8073</td>
+      <td align="right" style="background-color: rgb(255,130,130)">0.807</td>
+    </tr>
+    <tr>
+      <td align="right">MAXDIFF: Delivery &amp;amp; inventory management</td>
+      <td align="right" style="background-color: rgb(225,255,225)">1.165</td>
+      <td align="right" style="background-color: rgb(255,142,142)">0.8247</td>
+      <td align="right" style="background-color: rgb(255,175,175)">0.8761</td>
+    </tr>
+    <tr>
+      <td align="right">MAXDIFF: Low material price</td>
+      <td align="right" style="background-color: rgb(234,255,234)">1.116</td>
+      <td align="right" style="background-color: rgb(255,256,256)">0.9339</td>
+      <td align="right" style="background-color: rgb(255,146,146)">0.8322</td>
+    </tr>
+    <tr>
+      <td align="right">MAXDIFF: Formula based or fixed material price</td>
+      <td align="right" style="background-color: rgb(228,255,228)">1.146</td>
+      <td align="right" style="background-color: rgb(255,256,256)">0.9257</td>
+      <td align="right" style="background-color: rgb(255,110,110)">0.7766</td>
+    </tr>
+    <tr>
+      <td align="right">MAXDIFF: Material coloring solutions</td>
+      <td align="right" style="background-color: rgb(255,0,0)">0.6062</td>
+      <td align="right" style="background-color: rgb(255,30,30)">0.653</td>
+      <td align="right" style="background-color: rgb(0,255,0)">2.371</td>
+    </tr>
+    <tr>
+      <td align="right">MAXDIFF: Account manager relationship</td>
+      <td align="right" style="background-color: rgb(255,256,256)">0.9802</td>
+      <td align="right" style="background-color: rgb(224,255,224)">1.168</td>
+      <td align="right" style="background-color: rgb(255,132,132)">0.8097</td>
+    </tr>
+    <tr>
+      <td align="right">MAXDIFF: Collaboration during your innovation process</td>
+      <td align="right" style="background-color: rgb(255,188,188)">0.896</td>
+      <td align="right" style="background-color: rgb(255,256,256)">1.088</td>
+      <td align="right" style="background-color: rgb(235,255,235)">1.11</td>
+    </tr>
+  </tbody>
+</table>
+
+</div>
+
+<p></div>
+</div></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+      <slide class="" id="slide-12" style="background:;">
+  <hgroup>
+    <h2>Appendix 4 (continued)</h2>
+  </hgroup>
+  <article>
+    <p>Following are ratios of segment average over population average for profiling variables:
+<br></p>
+
+<div class="wrapper" style="font-size:20px;">
+<div class="row">
+<div class="col-md-6">
+<table border="1" class="data table table-bordered table-condensed">
+  <thead class="thead">
+    <tr>
+      <th></th>
+      <th>Segment 1</th>
+      <th>Segment 2</th>
+      <th>Segment 3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="right">MAXDIFF: Collaboration for growth</td>
+      <td align="right" style="background-color: rgb(255,0,0)">0.4952</td>
+      <td align="right" style="background-color: rgb(107,255,107)">1.96</td>
+      <td align="right" style="background-color: rgb(255,149,149)">0.7894</td>
+    </tr>
+    <tr>
+      <td align="right">MAXDIFF: Support towards your sustainability goals</td>
+      <td align="right" style="background-color: rgb(255,256,256)">0.9283</td>
+      <td align="right" style="background-color: rgb(228,255,228)">1.177</td>
+      <td align="right" style="background-color: rgb(255,256,256)">0.9136</td>
+    </tr>
+    <tr>
+      <td align="right">MAXDIFF: Material quality</td>
+      <td align="right" style="background-color: rgb(255,256,256)">1.04</td>
+      <td align="right" style="background-color: rgb(255,256,256)">0.9463</td>
+      <td align="right" style="background-color: rgb(255,256,256)">0.9856</td>
+    </tr>
+    <tr>
+      <td align="right">MAXDIFF: Supplier expertise of your industry</td>
+      <td align="right" style="background-color: rgb(255,256,256)">0.9997</td>
+      <td align="right" style="background-color: rgb(255,256,256)">0.9975</td>
+      <td align="right" style="background-color: rgb(255,256,256)">1.004</td>
+    </tr>
+    <tr>
+      <td align="right">MAXDIFF: Global service and operations</td>
+      <td align="right" style="background-color: rgb(255,46,46)">0.5866</td>
+      <td align="right" style="background-color: rgb(158,255,158)">1.632</td>
+      <td align="right" style="background-color: rgb(255,256,256)">1.044</td>
+    </tr>
+    <tr>
+      <td align="right">MAXDIFF: Local service and operations</td>
+      <td align="right" style="background-color: rgb(255,256,256)">0.9745</td>
+      <td align="right" style="background-color: rgb(240,255,240)">1.102</td>
+      <td align="right" style="background-color: rgb(255,256,256)">0.9149</td>
+    </tr>
+    <tr>
+      <td align="right">MAXDIFF: Business services</td>
+      <td align="right" style="background-color: rgb(255,69,69)">0.6323</td>
+      <td align="right" style="background-color: rgb(115,255,115)">1.911</td>
+      <td align="right" style="background-color: rgb(255,27,27)">0.5496</td>
+    </tr>
+    <tr>
+      <td align="right">MAXDIFF: Credit limit. financing and payment terms</td>
+      <td align="right" style="background-color: rgb(227,255,227)">1.187</td>
+      <td align="right" style="background-color: rgb(255,256,256)">0.9091</td>
+      <td align="right" style="background-color: rgb(255,107,107)">0.7072</td>
+    </tr>
+    <tr>
+      <td align="right">MAXDIFF: Broad material portfolio</td>
+      <td align="right" style="background-color: rgb(255,23,23)">0.5425</td>
+      <td align="right" style="background-color: rgb(255,28,28)">0.5522</td>
+      <td align="right" style="background-color: rgb(0,255,0)">2.655</td>
+    </tr>
+    <tr>
+      <td align="right">Willing to Changing suppliers</td>
+      <td align="right" style="background-color: rgb(255,256,256)">0.9984</td>
+      <td align="right" style="background-color: rgb(255,256,256)">1.017</td>
+      <td align="right" style="background-color: rgb(255,256,256)">0.9804</td>
+    </tr>
+    <tr>
+      <td align="right">Paid premium in past</td>
+      <td align="right" style="background-color: rgb(255,196,196)">0.8819</td>
+      <td align="right" style="background-color: rgb(239,255,239)">1.106</td>
+      <td align="right" style="background-color: rgb(237,255,237)">1.117</td>
+    </tr>
+  </tbody>
+</table>
+
+</div>
+
+<p></div>
+</div></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
     <slide class="backdrop"></slide>
   </slides>
-  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
-    <ul>
-      <li>
-      <a href="#" target="_self" rel='tooltip' 
-        data-slide=1 title='Factor Analysis'>
-         1
-      </a>
-    </li>
-    <li>
-      <a href="#" target="_self" rel='tooltip' 
-        data-slide=2 title='Factors'>
-         2
-      </a>
-    </li>
-    <li>
-      <a href="#" target="_self" rel='tooltip' 
-        data-slide=3 title='Cluster Analysis'>
-         3
-      </a>
-    </li>
-    <li>
-      <a href="#" target="_self" rel='tooltip' 
-        data-slide=4 title='Matured clients'>
-         4
-      </a>
-    </li>
-    <li>
-      <a href="#" target="_self" rel='tooltip' 
-        data-slide=5 title='Entry level clients'>
-         5
-      </a>
-    </li>
-    <li>
-      <a href="#" target="_self" rel='tooltip' 
-        data-slide=6 title='Support oriented and cash rich clients'>
-         6
-      </a>
-    </li>
-    <li>
-      <a href="#" target="_self" rel='tooltip' 
-        data-slide=7 title='Appendix'>
-         7
-      </a>
-    </li>
-    <li>
-      <a href="#" target="_self" rel='tooltip' 
-        data-slide=8 title='Appendix'>
-         8
-      </a>
-    </li>
-    <li>
-      <a href="#" target="_self" rel='tooltip' 
-        data-slide=9 title='Appendix'>
-         9
-      </a>
-    </li>
-  </ul>
-  </div>  <!--[if IE]>
+
+  <!--[if IE]>
     <script 
       src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
     </script>
     <script>CFInstall.check({mode: 'overlay'});</script>
   <![endif]-->
 </body>
-  <!-- Load Javascripts for Widgets -->
-  
-  <!-- LOAD HIGHLIGHTER JS FILES -->
-  <script src="http://slidifylibraries2.googlecode.com/git/inst/libraries/highlighters/highlight.js/highlight.pack.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
-  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
-   
-  </html>
+<!-- Grab CDN jQuery, fall back to local if offline -->
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://slidifylibraries.googlecode.com/git/inst/libraries/widgets/quiz/js/jquery-1.7.min.js"><\/script>')</script>
+<!-- Load Javascripts for Widgets -->
+<!-- LOAD HIGHLIGHTER JS FILES -->
+<script src="http://slidifylibraries.googlecode.com/git/inst/libraries/highlighters/highlight.js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<!-- DONE LOADING HIGHLIGHTER JS FILES -->
+</html>

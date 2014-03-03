@@ -7,10 +7,46 @@ widgets : []
 mode : standalone 
 ---
 
+## Factor Analysis 
+
+<br>
+<style>
+.wrapper{
+height: 120%;
+width: 900px;
+overflow: auto;
+}
+</style>
+<div class="wrapper" style="font-size:18px;">
+<div class="row">
+<div class="col-md-3">
+```{r echo=FALSE, comment=NA, warning=FALSE, error=FALSE,message=FALSE,results='asis'}
+
+Variance_Explained_Table <- Variance_Explained_Table[, -3]
+
+m<-gvisTable(Variance_Explained_Table,options=list(width=900, height=450,allowHTML=TRUE,page='disable'),formats=list(Eigenvalue="#.##",Cumulative_percentage_of_explained_variance="#.##"))
+print(m,'chart')
+```
+</div>
+</div>
+</div>
+
+---
 
 ## Factor Analysis
 
-From factor analysis, we have decided to keep `r factors_selected` factors, which can cover `r round(Variance_Explained_Table_copy[factors_selected, "cumulative percentage of variance"], 2)`% of the variance in the original dataset, from the survey's 20 different needs.
+```{r Fig1, echo=FALSE, comment=NA, results='asis', message=FALSE, fig.align='center', fig=TRUE}
+
+eigenvalues  <- Variance_Explained_Table[,2]
+df           <- cbind(as.data.frame(eigenvalues), c(1:length(eigenvalues)), rep(1, length(eigenvalues)))
+colnames(df) <- c("eigenvalues", "components", "abline")
+Line         <- gvisLineChart(as.data.frame(df), xvar="components", yvar=c("eigenvalues","abline"), options=list(title='Scree plot', legend="right", width=700, height=400, hAxis="{title:'Number of Components', titleTextStyle:{color:'black'}}", vAxes="[{title:'Eigenvalues'}]",  series="[{color:'green',pointSize:3, targetAxisIndex: 0}]"))
+print(Line, 'chart')
+```
+
+<br>
+
+From factor analysis, statistically, we can decide to use only 6 factors using scree plot. However, we have decided to keep `r factors_selected` factors, which can cover `r round(Variance_Explained_Table_copy[factors_selected, "cumulative percentage of variance"], 2)`% of the variance in the original dataset, from the survey's 20 different needs.
 
 ---
 
@@ -41,6 +77,15 @@ We can create 3 segments using the scores from factor analysis and they are as f
 
 3. Support oriented and cash rich clients
 
+```{r fig.width=9, fig.height=5, message=FALSE, echo=FALSE, fig.align='center', warning=FALSE, fig=TRUE}
+
+plot(Cluster_Profile_standar_mean[, 1,drop=F], type="l", col=custColors[1], main="Snake plot for each cluster", ylab="mean of cluster", xlab="Profiling variables (standardized)",ylim=c(min(Cluster_Profile_standar_mean),max(Cluster_Profile_standar_mean))) 
+for(i in 2:ncol(Cluster_Profile_standar_mean))
+  lines(Cluster_Profile_standar_mean[, i], col=custColors[i])
+
+legend(x=35, y=1, legend=c("1","2","3"), lty=c(1,1,1), lwd=c(1,1,1), col=c(custColors[1], custColors[2], custColors[3]), title="Segments")
+```
+
 ---
 
 ## Matured clients
@@ -67,7 +112,7 @@ They definitely are cash rish clients. They rate generally lower than population
 
 ---
 
-## Appendix
+## Appendix 1
 
 Following are selected significant ratio of segment average over population average for matured clients :
 
@@ -82,7 +127,7 @@ Following are selected significant ratio of segment average over population aver
 
 ---
 
-## Appendix 
+## Appendix 2
 
 Following are selected significant ratio of segment average over population average for entry level clients :
 
@@ -99,7 +144,7 @@ Following are selected significant ratio of segment average over population aver
 
 ---
 
-## Appendix 
+## Appendix 3
 
 Following are selected significant ratio of segment average over population average for support oriented and cash rich clients :
 
@@ -114,3 +159,37 @@ Following are selected significant ratio of segment average over population aver
 9. Total system cost reduction (`r round(cluster_profile_ratios["MAXDIFF: Total system cost reduction",3],2)`) 
 10. Formula based or fixed material price (`r round(cluster_profile_ratios["MAXDIFF: Formula based or fixed material price",3],2)`)
 11. Willing to change supplier (`r round(cluster_profile_ratios["Willing to Changing suppliers",3],2)`)
+
+---
+
+## Appendix 4
+
+Following are ratios of segment average over population average for profiling variables:
+<br>
+
+<div class="wrapper" style="font-size:20px;">
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, results='asis'}
+cat(renderHeatmapX(cluster_profile_ratios[1:11,], border=1, center = 1, minvalue = heatmin))
+```
+</div>
+</div>
+</div>
+
+---
+
+## Appendix 4 (continued)
+
+Following are ratios of segment average over population average for profiling variables:
+<br>
+
+<div class="wrapper" style="font-size:20px;">
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, results='asis'}
+cat(renderHeatmapX(cluster_profile_ratios[c(12:21,32),], border=1, center = 1, minvalue = heatmin))
+```
+</div>
+</div>
+</div>

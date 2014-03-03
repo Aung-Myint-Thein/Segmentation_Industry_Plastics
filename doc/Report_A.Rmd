@@ -602,7 +602,7 @@ if (ncol(ProjectData_scaled_profile) < 2)
 colnames(Cluster_Profile_standar_mean) <- paste("Segment", 1:length(cluster_ids), sep=" ")
 
 ## choose the colors for snake plots
-custColors <- rainbow(12)[c(1, 2, 5, 9, 11, 12)]
+custColors <- rainbow(12)[c(1, 2, 9, 5, 11, 12)]
 
 plot(Cluster_Profile_standar_mean[, 1,drop=F], type="l", col=custColors[1], main="Snake plot for each cluster", ylab="mean of cluster", xlab="Profiling variables (standardized)",ylim=c(min(Cluster_Profile_standar_mean),max(Cluster_Profile_standar_mean))) 
 for(i in 2:ncol(Cluster_Profile_standar_mean))
